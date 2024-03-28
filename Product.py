@@ -16,7 +16,6 @@ class Product:
         return self.__productName
     def getQuantity(self):
         return self.__productQuantity
-
     #methods to update quantity
     def addQuantity(self, amount):
         #ensure the amount is an integer
@@ -43,5 +42,5 @@ class Product:
     #update the toString method to display all attributes & their values
     def __str__(self):
         string = ("Product ID: " + str(self.__productID) + "\nProduct Name: " + str(self.__productName) +
-              "\nProduct Price: $" + str(self.__productPrice) + "\nProduct Quantity: " + str(self.__productQuantity))
+              "\nProduct Price: $" + str(self.__productPrice) + "\nProduct Quantity: " + str(self.__productQuantity) + "\n")
         return string

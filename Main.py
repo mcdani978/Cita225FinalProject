@@ -1,11 +1,17 @@
 #this program will store the main process of the project.
 from Product import Product
+from LinkedList import LinkedList
+from Stack import Stack
 
-#create empty dictionary to store products with their ID as a key & the object as the value. this INCLUDES the objects of the products
+#create empty dictionary to store products with their ID as a key & the object as the value.
+#this INCLUDES the objects of the products
 productDictionary = {}
 #create empty list to store product names & organize the products. This DOES NOT INCLUDE the objects of the products
 productList = []
-
+#create empty linked list for shopping cart functionalities. This INCLUDES the product objects
+shoppingCart = LinkedList()
+#create stack object to hold all additions and deletions from the cart. this INCLUDES the product objects
+cartHistory = Stack()
 
 def main():
     #loop main function.
@@ -25,7 +31,6 @@ def main():
             userInput = askForUserInput("Please enter your Option: ", "int")
 
         #match functionality to the given input. functionalities are given by their number as listed above
-
         match userInput:
             case 1:
                 addProduct()
@@ -104,7 +109,8 @@ def addProduct():
 
 def removeProduct():
     #remove the product from the list & dictionary
-    userInput = askForUserInput("Please enter the product ID you want to remove, or type -1 to exit: ", "int")
+    userInput = askForUserInput("Please enter the product ID you want to remove, "
+                                "or type -1 to exit: ", "int")
 
     if userInput < 0:
         return
@@ -112,7 +118,8 @@ def removeProduct():
     #check if item is in the dictionary. if not, ask user to enter a different value
     while userInput not in productDictionary:
         print("Product ID not found. Please enter a different ID")
-        userInput = askForUserInput("Please enter the product ID you want to remove, or type -1 to exit: ", "int")
+        userInput = askForUserInput("Please enter the product ID you want to remove, "
+                                    "or type -1 to exit: ", "int")
         if userInput < 0:
             return
 
@@ -125,7 +132,8 @@ def removeProduct():
 
 def updateProductQuantity():
     #remove the product from the list & dictionary
-    userInput = askForUserInput("Please enter the product ID for the product you wish to update, or type -1 to exit: ", "int")
+    userInput = askForUserInput("Please enter the product ID for the product you wish to update, "
+                                "or type -1 to exit: ", "int")
 
     if userInput < 0:
         return
@@ -133,7 +141,8 @@ def updateProductQuantity():
     #check if item is in the dictionary. if not, ask user to enter a different value
     while userInput not in productDictionary:
         print("Product ID not found. Please enter a different ID")
-        userInput = askForUserInput("Please enter the product ID you want to remove, or type -1 to exit: ", "int")
+        userInput = askForUserInput("Please enter the product ID you want to remove, "
+                                    "or type -1 to exit: ", "int")
         if userInput < 0:
             return
 
@@ -145,7 +154,8 @@ def updateProductQuantity():
 
     while newQuantity < 0:
         print("Invalid quantity. Please enter a positive integer")
-        newQuantity = askForUserInput("please enter the new quantity of the product, or type -1 to exit", "int")
+        newQuantity = askForUserInput("please enter the new quantity of the product, "
+                                      "or type -1 to exit", "int")
         if newQuantity < 0:
             return
 
@@ -153,22 +163,107 @@ def updateProductQuantity():
     productDictionary[userInput].setQuantity(newQuantity)
 
 def addToCart():
-    return
+    #loop until the user doesn't want to continue shopping
+    while True:
+        #each node will be a Product added to the cart.
+        #Display all products & let user choose product they want.
+        for index in range(len(productList)):
+            print(f"{index}. " + productList[index])
+        userInput = askForUserInput("please choose an item you want to add to cart, "
+                                    "or type -1 to exit", "int")
+
+        if userInput < 0:
+            return
+        while userInput >= len(productList):
+            print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
+            for index in range(len(productList)):
+                print(f"{index}. " + productList[index])
+            userInput = askForUserInput("please choose an item you want to add to cart, "
+                                        "or type -1 to exit", "int")
+            if userInput < 0:
+                return
+
+        #find user option in productDictionary.
+        for key in productDictionary:
+            #store object in a temporary variable. Python doesn't like to behave sometimes
+            tempObj = productDictionary[key]
+
+            if tempObj.getName() == productList[userInput]:
+                #check if the store has ran out of the product
+                if tempObj.getQuantity() == 0:
+                    print("Sorry, we are out of that product")
+                    break; #no need to continue looping
+                else:
+                    # add to shopping cart
+                    print("adding to cart...")
+                    shoppingCart.add(tempObj)
+                    #remove 1 quantity from the object
+                    tempObj.removeQuantity(1)
+                    break; #no need to continue looping
 
 def removeFromCart():
-    return
+    #loop until user doesn't want to remove a product
+    while True:
+        #remove first occurrence of an item from the cart, add 1 quantity back to the product, add action to cart history
+        #create list showing products they can remove
+        for index in range(len(productList)):
+            print(f"{index}. " + productList[index])
+        #ask user what they want to remove
+
+        userInput = askForUserInput("What product from cart do you want to remove?, "
+                                    "or type -1 to exit", "int")
+        if userInput < 0:
+            return
+        while userInput >= len(productList):
+            print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
+            for index in range(len(productList)):
+                print(f"{index}. " + productList[index])
+            userInput = askForUserInput("please choose an item you want to add to cart, "
+                                        "or type -1 to exit", "int")
+            if userInput < 0:
+                return
+
+        #check if product is in cart. if not, do nothing, else, remove from cart & add action to history
+        for key in productDictionary:
+            if productList[userInput] == productDictionary[key].getName():
+                #remove LAST occurrence of product from list
+                if not shoppingCart.remove(productDictionary[key]):
+                    print("item not in cart")
+                else:
+                    print("Removing...")
+                    #add product back to shelf
+                    productDictionary[key].addQuantity(1)
+                    #add action to stack history
+                    cartHistory.push(productDictionary[key])
 
 def undoRemoveFromCart():
-    return
+    #check if product is in stock before adding back to cart
+
+    #store object in variable
+    addBackToCart = cartHistory.pop()
+
+    #check if item has been popped from cart
+    if addBackToCart!= None:
+        #check if product has been sold out
+        if addBackToCart.getQuantity() > 0:
+            #add back to cart
+            print("adding to cart...")
+            shoppingCart.add(addBackToCart)
+            # remove 1 quantity from the object
+            addBackToCart.removeQuantity(1)
+        else:
+            print(f"Sorry, we sold out of the product: {addBackToCart.getName()}")
+    else:
+        print("No action in history")
 
 def displayInventory():
     for key in productDictionary:
         print(productDictionary[key])
         print()
 
-
 def displayCart():
-    return
+    #print the shopping cart
+    print(shoppingCart)
 
 def askForUserInput(strMessage, type):
     #store user input in a variable & check if all characters are digits
@@ -206,7 +301,9 @@ def askForUserInput(strMessage, type):
             # replace "." in potential string with "" to better test string with isDigit() function
             # Credit for idea: https://pythonhow.com/how/check-if-a-string-is-a-float/
             testInput = userInput.replace(".", "")
-            testInput = userInput.replace("-", "")
+            testInput = testInput.replace("-", "")
+
+            #print("testinput:" + str(testInput))
 
             # Check if user input is a number. if not, make them enter a valid number
             while not testInput.isdigit():
@@ -215,7 +312,6 @@ def askForUserInput(strMessage, type):
                 testInput = userInput.replace(".", "")
             return float(userInput)
         case __:
-            raise Exception("Error: 'type' argument is invalid")
-
+            raise Exception("Error: 'type' argument is invalid. Valid types:\nstring\nint\nfloat")
 
 main()

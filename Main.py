@@ -1,7 +1,12 @@
+#to save data over sessions, you need ot write the product information to 
+
+
 #this program will store the main process of the project.
 from Product import Product
 from LinkedList import LinkedList
 from Stack import Stack
+#get the savedData.py file information
+from savedData import *
 
 #create empty dictionary to store products with their ID as a key & the object as the value.
 #this INCLUDES the objects of the products
@@ -14,21 +19,20 @@ shoppingCart = LinkedList()
 cartHistory = Stack()
 
 def main():
+    #initialize the program information
+    initializeProgram()
+
     #loop main function.
     while True:
         print("\n\n\n\n1. Add product\n2. Remove product \n3. Update Product Quantity\n4. Add to Cart"
-              "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart\n")
+              "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart\nDefault:"
+              "Exit Program.\n")
 
         #Max selection is the number of functionalities the user has to choose from.
         maxSelection = 8
 
         #gather user input
         userInput = askForUserInput("Please enter your Option: ", "int")
-
-        #test if user input is in valid range of integers
-        while userInput < 1 or userInput > maxSelection:
-            print("Please enter a valid selection from 1 to " + str(maxSelection))
-            userInput = askForUserInput("Please enter your Option: ", "int")
 
         #match functionality to the given input. functionalities are given by their number as listed above
         match userInput:
@@ -48,6 +52,9 @@ def main():
                 displayInventory()
             case 8:
                 displayCart()
+            case __:
+                endProgram()
+                return
 
 #methods to add to main:
 def addProduct():
@@ -313,5 +320,108 @@ def askForUserInput(strMessage, type):
             return float(userInput)
         case __:
             raise Exception("Error: 'type' argument is invalid. Valid types:\nstring\nint\nfloat")
+
+
+
+#initializeProgram will retrieve all data from savedData.py file to initialize the list, dictionary, shopping cart,
+#and the cart history.
+def initializeProgram():
+    #set the productDictionary from dictionary information given by savedData.py
+    #read each element in the 2-d list, create the object given the information, & store that in the dictionary
+    for i in range(len(dictionaryInformation)):
+        list = dictionaryInformation[i]
+        pID = list[0]
+        pName = list[1]
+        pPrice = list[2]
+        pQuantity = list[3]
+        #create object
+        tempObj = Product(pID,pName,pPrice,pQuantity)
+        #send object to dictionary
+        productDictionary[pID] = tempObj
+
+    #set the productList from listInformation given by savedData.py
+    for element in listInformation:
+        productList.append(element)
+
+    #set the shoppingCart from shoppingCartInformation given by savedData.py
+    for row in shoppingCartInformation:
+        #store info in respective variables
+        pID = row[0]
+        pName = row[1]
+        pPrice = row[2]
+        pQuantity = row[3]
+
+        #create temporary object
+        tempObj = Product(pID,pName,pPrice,pQuantity)
+        #send object to shopping cart list
+        shoppingCart.add(tempObj)
+
+    #set the cartHistory from cartHistoryInformation given by savedData.py
+    #reverse order of cartHistoryInformation. first in is last element in list
+    cartHistoryInformation.reverse()
+    for row in cartHistoryInformation:
+        #store info in respective variables
+        pID = row[0]
+        pName = row[1]
+        pPrice = row[2]
+        pQuantity = row[3]
+
+        #create temporary object
+        tempObj = Product(pID,pName,pPrice,pQuantity)
+        #send obejct to cartHistory
+        cartHistory.push(tempObj)
+
+#end program will save all user data to a python file. saved data will include the list, dictionary, shopping cart,
+#and the cart history.
+def endProgram():
+    file = open("savedData.py", "w")
+
+    #to save an object to the file, you need to get each attribute out of the object & send the information over.
+    #data will be saved in a 2-d list. each row will save the obejct information & each column will contain
+    #the product ID, name, price, and quanitity in that order
+
+    #add productDictionary information
+    objectList = []
+    for key in productDictionary:
+        pID = productDictionary[key].getID()
+        pName = productDictionary[key].getName()
+        pPrice = productDictionary[key].getPrice()
+        pQuantity = productDictionary[key].getQuantity()
+
+        objectList.append([pID,pName,pPrice,pQuantity])
+
+    #write the dictionary information to the file
+    file.write("dictionaryInformation = " + str(objectList) + "\n")
+
+    #write product list to the file
+    file.write("listInformation = " + str(productList) + "\n")
+
+    #write the shopping cart information to the file
+    shoppingCartInformation = []
+    while not shoppingCart.isEmpty():
+        shoppingCartObj = shoppingCart.removeLast()
+        pID = shoppingCartObj.getID()
+        pName = shoppingCartObj.getName()
+        pPrice = shoppingCartObj.getPrice()
+        pQuantity = shoppingCartObj.getQuantity()
+        shoppingCartInformation.append([pID,pName,pPrice,pQuantity])
+
+    #add shoppingCartInfo to the file
+    file.write("shoppingCartInformation = " + str(shoppingCartInformation) + "\n")
+
+    #add cart history to the shopping cart
+    cartHistoryInformation = []
+
+    while not cartHistory.isEmpty():
+        cartHistoryObj = cartHistory.pop()
+        pID = cartHistoryObj.getID()
+        pName = cartHistoryObj.getName()
+        pPrice = cartHistoryObj.getPrice()
+        pQuantity = cartHistoryObj.getQuantity()
+        cartHistoryInformation.append([pID,pName,pPrice,pQuantity])
+    #write cartHistory info to file
+    file.write("cartHistoryInformation = " + str(cartHistoryInformation) + "\n")
+    #close the file
+    file.close()
 
 main()

@@ -109,10 +109,10 @@ def addProduct():
     newProduct = Product(pID, pName, round(pPrice, 2), pQuantity)
 
     #add object to dictionary
-    productDictionary[newProduct.getID()] = newProduct
+    productDictionary[newProduct.get_id()] = newProduct
 
     #add product name to list
-    productList.append(newProduct.getName())
+    productList.append(newProduct.get_name())
 
 def removeProduct():
     #remove the product from the list & dictionary
@@ -131,7 +131,7 @@ def removeProduct():
             return
 
     #store name of product in temp variable to remove from productList
-    pName = productDictionary[userInput].getName()
+    pName = productDictionary[userInput].get_name()
 
     #remove product from list & dictionary
     productDictionary.pop(userInput)
@@ -167,7 +167,7 @@ def updateProductQuantity():
             return
 
     #update quantity of the product
-    productDictionary[userInput].setQuantity(newQuantity)
+    productDictionary[userInput].set_quantity(newQuantity)
 
 def addToCart():
     #loop until the user doesn't want to continue shopping
@@ -195,9 +195,9 @@ def addToCart():
             #store object in a temporary variable. Python doesn't like to behave sometimes
             tempObj = productDictionary[key]
 
-            if tempObj.getName() == productList[userInput]:
+            if tempObj.get_name() == productList[userInput]:
                 #check if the store has ran out of the product
-                if tempObj.getQuantity() == 0:
+                if tempObj.get_quantity() == 0:
                     print("Sorry, we are out of that product")
                     break; #no need to continue looping
                 else:
@@ -205,7 +205,7 @@ def addToCart():
                     print("adding to cart...")
                     shoppingCart.add(tempObj)
                     #remove 1 quantity from the object
-                    tempObj.removeQuantity(1)
+                    tempObj.remove_quantity(1)
                     break; #no need to continue looping
 
 def removeFromCart():
@@ -232,14 +232,14 @@ def removeFromCart():
 
         #check if product is in cart. if not, do nothing, else, remove from cart & add action to history
         for key in productDictionary:
-            if productList[userInput] == productDictionary[key].getName():
+            if productList[userInput] == productDictionary[key].get_name():
                 #remove LAST occurrence of product from list
                 if not shoppingCart.remove(productDictionary[key]):
                     print("item not in cart")
                 else:
                     print("Removing...")
                     #add product back to shelf
-                    productDictionary[key].addQuantity(1)
+                    productDictionary[key].add_quantity(1)
                     #add action to stack history
                     cartHistory.push(productDictionary[key])
 
@@ -252,14 +252,14 @@ def undoRemoveFromCart():
     #check if item has been popped from cart
     if addBackToCart!= None:
         #check if product has been sold out
-        if addBackToCart.getQuantity() > 0:
+        if addBackToCart.get_quantity() > 0:
             #add back to cart
             print("adding to cart...")
             shoppingCart.add(addBackToCart)
             # remove 1 quantity from the object
-            addBackToCart.removeQuantity(1)
+            addBackToCart.remove_quantity(1)
         else:
-            print(f"Sorry, we sold out of the product: {addBackToCart.getName()}")
+            print(f"Sorry, we sold out of the product: {addBackToCart.get_name()}")
     else:
         print("No action in history")
 
@@ -383,10 +383,10 @@ def endProgram():
     #add productDictionary information
     objectList = []
     for key in productDictionary:
-        pID = productDictionary[key].getID()
-        pName = productDictionary[key].getName()
-        pPrice = productDictionary[key].getPrice()
-        pQuantity = productDictionary[key].getQuantity()
+        pID = productDictionary[key].get_id()
+        pName = productDictionary[key].get_name()
+        pPrice = productDictionary[key].get_price()
+        pQuantity = productDictionary[key].get_quantity()
 
         objectList.append([pID,pName,pPrice,pQuantity])
 
@@ -400,10 +400,10 @@ def endProgram():
     shoppingCartInformation = []
     while not shoppingCart.isEmpty():
         shoppingCartObj = shoppingCart.removeLast()
-        pID = shoppingCartObj.getID()
-        pName = shoppingCartObj.getName()
-        pPrice = shoppingCartObj.getPrice()
-        pQuantity = shoppingCartObj.getQuantity()
+        pID = shoppingCartObj.get_id()
+        pName = shoppingCartObj.get_name()
+        pPrice = shoppingCartObj.get_price()
+        pQuantity = shoppingCartObj.get_quantity()
         shoppingCartInformation.append([pID,pName,pPrice,pQuantity])
 
     #add shoppingCartInfo to the file
@@ -414,10 +414,10 @@ def endProgram():
 
     while not cartHistory.isEmpty():
         cartHistoryObj = cartHistory.pop()
-        pID = cartHistoryObj.getID()
-        pName = cartHistoryObj.getName()
-        pPrice = cartHistoryObj.getPrice()
-        pQuantity = cartHistoryObj.getQuantity()
+        pID = cartHistoryObj.get_id()
+        pName = cartHistoryObj.get_name()
+        pPrice = cartHistoryObj.get_price()
+        pQuantity = cartHistoryObj.get_quantity()
         cartHistoryInformation.append([pID,pName,pPrice,pQuantity])
     #write cartHistory info to file
     file.write("cartHistoryInformation = " + str(cartHistoryInformation) + "\n")

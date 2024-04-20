@@ -1,67 +1,40 @@
-# This program will store the main process of the project.
-import tkinter as tk
-from tkinter import simpledialog
+#to save data over sessions, you need ot write the product information to 
+
+
+#this program will store the main process of the project.
 from Product import Product
 from LinkedList import LinkedList
 from Stack import Stack
-# Get the savedData.py file information
+#get the savedData.py file information
 from savedData import *
 
-# Add imports for GUI interface
-from GUI import GUI
-
-# Create empty dictionary to store products with their ID as a key & the object as the value.
-# This INCLUDES the objects of the products
+#create empty dictionary to store products with their ID as a key & the object as the value.
+#this INCLUDES the objects of the products
 productDictionary = {}
-# Create empty list to store product names & organize the products. This DOES NOT INCLUDE the objects of the products
+#create empty list to store product names & organize the products. This DOES NOT INCLUDE the objects of the products
 productList = []
-# Create empty linked list for shopping cart functionalities. This INCLUDES the product objects
+#create empty linked list for shopping cart functionalities. This INCLUDES the product objects
 shoppingCart = LinkedList()
-# Create stack object to hold all additions and deletions from the cart. this INCLUDES the product objects
+#create stack object to hold all additions and deletions from the cart. this INCLUDES the product objects
 cartHistory = Stack()
 
 def main():
-    # Initialize the program information
+    #initialize the program information
     initializeProgram()
 
-    # Ask the user for interface choice
-    interface_choice = askForInterfaceChoice()
-
-    # Launch GUI if choice is 1, otherwise continue with the command-line interface
-    if interface_choice == 1:
-        # Launch GUI interface
-        root = tk.Tk()
-        app = GUI(root, productDictionary, productList, shoppingCart, cartHistory)
-        root.mainloop()
-    elif interface_choice == 2:
-        # Start command-line interface
-        startCommandLineInterface()
-    else:
-        print("Invalid choice. Exiting program.")
-
-def askForInterfaceChoice():
-    while True:
-        try:
-            choice = int(input("Choose interface:\n1. GUI Interface\n2. Command Line Interface\nEnter choice: "))
-            if choice not in [1, 2]:
-                raise ValueError
-            return choice
-        except ValueError:
-            print("Invalid input. Please enter 1 or 2.")
-
-def startCommandLineInterface():
-    # Loop main function
+    #loop main function.
     while True:
         print("\n\n\n\n1. Add product\n2. Remove product \n3. Update Product Quantity\n4. Add to Cart"
               "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart\nDefault:"
               "Exit Program.\n")
 
+        #Max selection is the number of functionalities the user has to choose from.
         maxSelection = 8
 
-        # Gather user input
+        #gather user input
         userInput = askForUserInput("Please enter your Option: ", "int")
 
-        # Match functionality to the given input
+        #match functionality to the given input. functionalities are given by their number as listed above
         match userInput:
             case 1:
                 addProduct()
@@ -85,59 +58,61 @@ def startCommandLineInterface():
 
 #methods to add to main:
 def addProduct():
-    # This method should create a new product object with ID, Price, Name, & Quantity
-    # Ask user to enter values for a new product
+    #this method should create a new product object with ID, Price, Name, & Quantity
+    #ask user to enter values for a new product
+
     pID = askForUserInput("Please enter the product ID, or type -1 to exit: ", "int")
 
-    # Exit if input is negative
+    #exit if input is negative
     if pID < 0:
         return
 
-    # If ID already exists, ask user to enter a different ID
+    #if ID already exists, ask user to enter a different ID
     while pID in productDictionary:
         print("ID already exists. Please enter a different ID")
         pID = askForUserInput("Please enter the product ID, or type -1 to exit: ", "int")
-        # Exit if input is negative
+        # exit if input is negative
         if pID < 0:
             return
 
-    pName = askForUserInput("Please enter the product Name, or type -1 to exit: ", "string")
+    pName = askForUserInput("Please enter the product Name,or type -1 to exit: ", "string")
     pName = pName.lower()
 
-    # Exit if input is negative
+    #exit if input is negative
     if pName == "-1":
         return
 
-    # If name already exists in productList, ask user to enter a different name. This should ignore case sensitivity
+
+    #if name already exists in productlist, ask user to enter a different name. this should igore case sensitivity
     while pName in productList:
-        print("Name already exists. Please enter a different name")
+        print("name already exists. Please enter a different name")
         pName = askForUserInput("Please enter the product Name, or type -1 to exit: ", "string")
         pName = pName.lower()
 
-        # Exit if input is negative
+        # exit if input is negative
         if pName == "-1":
             return
 
     pPrice = askForUserInput("Please enter the product price, or type -1 to exit: ", "float")
 
-    # Exit if input is negative
+    # exit if input is negative
     if pPrice < 0:
         return
 
     pQuantity = askForUserInput("Please enter the quantity of the product, or type -1 to exit: ", "int")
 
-    # Exit if input is negative
+    # exit if input is negative
     if pQuantity < 0:
         return
 
-    # Create new object
+    #create new obejct
     newProduct = Product(pID, pName, round(pPrice, 2), pQuantity)
 
-    # Add object to dictionary
-    productDictionary[newProduct.getID()] = newProduct
+    #add object to dictionary
+    productDictionary[newProduct.get_id()] = newProduct
 
-    # Add product name to list
-    productList.append(newProduct.getName())
+    #add product name to list
+    productList.append(newProduct.get_name())
 
 def removeProduct():
     #remove the product from the list & dictionary
@@ -156,7 +131,7 @@ def removeProduct():
             return
 
     #store name of product in temp variable to remove from productList
-    pName = productDictionary[userInput].getName()
+    pName = productDictionary[userInput].get_name()
 
     #remove product from list & dictionary
     productDictionary.pop(userInput)
@@ -192,7 +167,7 @@ def updateProductQuantity():
             return
 
     #update quantity of the product
-    productDictionary[userInput].setQuantity(newQuantity)
+    productDictionary[userInput].set_quantity(newQuantity)
 
 def addToCart():
     #loop until the user doesn't want to continue shopping
@@ -220,9 +195,9 @@ def addToCart():
             #store object in a temporary variable. Python doesn't like to behave sometimes
             tempObj = productDictionary[key]
 
-            if tempObj.getName() == productList[userInput]:
+            if tempObj.get_name() == productList[userInput]:
                 #check if the store has ran out of the product
-                if tempObj.getQuantity() == 0:
+                if tempObj.get_quantity() == 0:
                     print("Sorry, we are out of that product")
                     break; #no need to continue looping
                 else:
@@ -230,7 +205,7 @@ def addToCart():
                     print("adding to cart...")
                     shoppingCart.add(tempObj)
                     #remove 1 quantity from the object
-                    tempObj.removeQuantity(1)
+                    tempObj.remove_quantity(1)
                     break; #no need to continue looping
 
 def removeFromCart():
@@ -257,14 +232,14 @@ def removeFromCart():
 
         #check if product is in cart. if not, do nothing, else, remove from cart & add action to history
         for key in productDictionary:
-            if productList[userInput] == productDictionary[key].getName():
+            if productList[userInput] == productDictionary[key].get_name():
                 #remove LAST occurrence of product from list
                 if not shoppingCart.remove(productDictionary[key]):
                     print("item not in cart")
                 else:
                     print("Removing...")
                     #add product back to shelf
-                    productDictionary[key].addQuantity(1)
+                    productDictionary[key].add_quantity(1)
                     #add action to stack history
                     cartHistory.push(productDictionary[key])
 
@@ -277,14 +252,14 @@ def undoRemoveFromCart():
     #check if item has been popped from cart
     if addBackToCart!= None:
         #check if product has been sold out
-        if addBackToCart.getQuantity() > 0:
+        if addBackToCart.get_quantity() > 0:
             #add back to cart
             print("adding to cart...")
             shoppingCart.add(addBackToCart)
             # remove 1 quantity from the object
-            addBackToCart.removeQuantity(1)
+            addBackToCart.remove_quantity(1)
         else:
-            print(f"Sorry, we sold out of the product: {addBackToCart.getName()}")
+            print(f"Sorry, we sold out of the product: {addBackToCart.get_name()}")
     else:
         print("No action in history")
 
@@ -408,10 +383,10 @@ def endProgram():
     #add productDictionary information
     objectList = []
     for key in productDictionary:
-        pID = productDictionary[key].getID()
-        pName = productDictionary[key].getName()
-        pPrice = productDictionary[key].getPrice()
-        pQuantity = productDictionary[key].getQuantity()
+        pID = productDictionary[key].get_id()
+        pName = productDictionary[key].get_name()
+        pPrice = productDictionary[key].get_price()
+        pQuantity = productDictionary[key].get_quantity()
 
         objectList.append([pID,pName,pPrice,pQuantity])
 
@@ -425,10 +400,10 @@ def endProgram():
     shoppingCartInformation = []
     while not shoppingCart.isEmpty():
         shoppingCartObj = shoppingCart.removeLast()
-        pID = shoppingCartObj.getID()
-        pName = shoppingCartObj.getName()
-        pPrice = shoppingCartObj.getPrice()
-        pQuantity = shoppingCartObj.getQuantity()
+        pID = shoppingCartObj.get_id()
+        pName = shoppingCartObj.get_name()
+        pPrice = shoppingCartObj.get_price()
+        pQuantity = shoppingCartObj.get_quantity()
         shoppingCartInformation.append([pID,pName,pPrice,pQuantity])
 
     #add shoppingCartInfo to the file
@@ -439,10 +414,10 @@ def endProgram():
 
     while not cartHistory.isEmpty():
         cartHistoryObj = cartHistory.pop()
-        pID = cartHistoryObj.getID()
-        pName = cartHistoryObj.getName()
-        pPrice = cartHistoryObj.getPrice()
-        pQuantity = cartHistoryObj.getQuantity()
+        pID = cartHistoryObj.get_id()
+        pName = cartHistoryObj.get_name()
+        pPrice = cartHistoryObj.get_price()
+        pQuantity = cartHistoryObj.get_quantity()
         cartHistoryInformation.append([pID,pName,pPrice,pQuantity])
     #write cartHistory info to file
     file.write("cartHistoryInformation = " + str(cartHistoryInformation) + "\n")

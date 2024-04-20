@@ -7,6 +7,9 @@ from LinkedList import LinkedList
 from Stack import Stack
 #get the savedData.py file information
 from savedData import *
+#Get user account class
+from UserAccount import UserAccount
+
 
 #create empty dictionary to store products with their ID as a key & the object as the value.
 #this INCLUDES the objects of the products
@@ -17,46 +20,63 @@ productList = []
 shoppingCart = LinkedList()
 #create stack object to hold all additions and deletions from the cart. this INCLUDES the product objects
 cartHistory = Stack()
+#cerate Dictionary for the user accounts
+userAccounts = {}
+#initialize the user account to guest when program starts
+guestAccount = UserAccount("guest", "123", 0, "guest")
+currentUser = guestAccount
 
 def main():
     #initialize the program information
     initializeProgram()
 
+    continueProgram = True
     #loop main function.
-    while True:
-        print("\n\n\n\n1. Add product\n2. Remove product \n3. Update Product Quantity\n4. Add to Cart"
-              "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart\nDefault:"
-              "Exit Program.\n")
+    while continueProgram:
+        # display the current user and account type
+        print("current user: " + currentUser.get_user_name())
+        print("current acct type: " + currentUser.get_account_type())
 
-        #Max selection is the number of functionalities the user has to choose from.
-        maxSelection = 8
+        continueProgram = displayOptions()
 
-        #gather user input
-        userInput = askForUserInput("Please enter your Option: ", "int")
+def displayOptions():
+    print("\n\n\n\n1. Add product\n2. Remove product \n3. Update Product Quantity\n4. Add to Cart"
+          "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart"
+          "\n9. Login\n10. Sign Up\n11. Sign Out\nDefault:"
+          "Exit Program.\n")
 
-        #match functionality to the given input. functionalities are given by their number as listed above
-        match userInput:
-            case 1:
-                addProduct()
-            case 2:
-                removeProduct()
-            case 3:
-                updateProductQuantity()
-            case 4:
-                addToCart()
-            case 5:
-                removeFromCart()
-            case 6:
-                undoRemoveFromCart()
-            case 7:
-                displayInventory()
-            case 8:
-                displayCart()
-            case __:
-                endProgram()
-                return
+    # gather user input
+    userInput = askForUserInput("Please enter your Option: ", "int")
 
-#methods to add to main:
+    # match functionality to the given input. functionalities are given by their number as listed above
+    match userInput:
+        case 1:
+            addProduct()
+        case 2:
+            removeProduct()
+        case 3:
+            updateProductQuantity()
+        case 4:
+            addToCart()
+        case 5:
+            removeFromCart()
+        case 6:
+            undoRemoveFromCart()
+        case 7:
+            displayInventory()
+        case 8:
+            displayCart()
+        case 9:
+            login()
+        case 10:
+            signUp()
+        case 11:
+            signOut()
+        case __:
+            endProgram()
+            return False
+    return True
+
 def addProduct():
     #this method should create a new product object with ID, Price, Name, & Quantity
     #ask user to enter values for a new product
@@ -272,62 +292,11 @@ def displayCart():
     #print the shopping cart
     print(shoppingCart)
 
-def askForUserInput(strMessage, type):
-    #store user input in a variable & check if all characters are digits
-    userInput = input(strMessage)
-
-    #print("type entered: " + type)
-
-    match type:
-
-        case "string":
-            #print("returning a string")
-            return userInput
-        case "int":
-            #print("returning an int")
-
-            # replace "." in potential string with "" to better test string with isDigit() function
-            # Credit for idea: https://pythonhow.com/how/check-if-a-string-is-a-float/
-            testInput = userInput.replace(".", "")
-            testInput = userInput.replace("-", "")
-            #Check if user input is a number. if not, make them enter a valid number
-            while not testInput.isdigit():
-                print("Please enter a valid number")
-                userInput = input(strMessage)
-                testInput = userInput.replace(".", "")
-
-                # check if user input is an integer. if not, that is it contains a "." in the number, repeat the function
-                # for the user to enter an integer.
-            if "." in userInput:
-                print("Please enter an integer")
-                userInput = askForUserInput(strMessage, type)
-            return int(userInput)
-        case "float":
-            #print("returning a float")
-
-            # replace "." in potential string with "" to better test string with isDigit() function
-            # Credit for idea: https://pythonhow.com/how/check-if-a-string-is-a-float/
-            testInput = userInput.replace(".", "")
-            testInput = testInput.replace("-", "")
-
-            #print("testinput:" + str(testInput))
-
-            # Check if user input is a number. if not, make them enter a valid number
-            while not testInput.isdigit():
-                print("Please enter a valid number")
-                userInput = input(strMessage)
-                testInput = userInput.replace(".", "")
-            return float(userInput)
-        case __:
-            raise Exception("Error: 'type' argument is invalid. Valid types:\nstring\nint\nfloat")
-
-
-
 #initializeProgram will retrieve all data from savedData.py file to initialize the list, dictionary, shopping cart,
 #and the cart history.
 def initializeProgram():
     #set the productDictionary from dictionary information given by savedData.py
-    #read each element in the 2-d list, create the object given the information, & store that in the dictionary
+    #read each element in the 2-d list, create the product given the information, & store that in the dictionary
     for i in range(len(dictionaryInformation)):
         list = dictionaryInformation[i]
         pID = list[0]
@@ -371,6 +340,55 @@ def initializeProgram():
         #send obejct to cartHistory
         cartHistory.push(tempObj)
 
+    #set the userAccounts dictionary from the userAccountInformation list given by SavedData.py
+    for row in userAccountInformation:
+        #store info in respective variables
+        UAName = row[0]
+        UAPassword = row[1]
+        UABalance = row[2]
+        UAAccountType = row[3]
+
+
+        shoppingCartObj = LinkedList()
+        #loop through 2-d lists and create objects to store in linked list object
+        UAShoppingCart = row[4]
+        for row in UAShoppingCart:
+            # store info in respective variables
+            pID = row[0]
+            pName = row[1]
+            pPrice = row[2]
+            pQuantity = row[3]
+
+            # create temporary object
+            tempShoppingCartProduct = Product(pID, pName, pPrice, pQuantity)
+            shoppingCartObj.add(tempShoppingCartProduct)
+
+
+        cartHistoryObj = Stack()
+        #loop through the 2d lists and create objects to store in stack object
+        UACartHistory = row[5]
+        # set the cartHistory from cartHistoryInformation given by savedData.py
+        # reverse order of cartHistoryInformation. first in is last element in list
+        UACartHistory.reverse()
+        for row in UACartHistory:
+            # store info in respective variables
+            pID = row[0]
+            pName = row[1]
+            pPrice = row[2]
+            pQuantity = row[3]
+            # create temporary object
+            tempCartHistoryProduct = Product(pID, pName, pPrice, pQuantity)
+            # send obejct to cartHistory
+            cartHistoryObj.push(tempCartHistoryProduct)
+
+        #create the UserAccount object
+        tempObj = UserAccount(UAName,UAPassword,UABalance,UAAccountType,shoppingCartObj,cartHistoryObj)
+
+        #send object to userAccounts dictionary
+        userAccounts[UAName] = tempObj
+
+
+
 #end program will save all user data to a python file. saved data will include the list, dictionary, shopping cart,
 #and the cart history.
 def endProgram():
@@ -382,6 +400,7 @@ def endProgram():
 
     #add productDictionary information
     objectList = []
+
     for key in productDictionary:
         pID = productDictionary[key].get_id()
         pName = productDictionary[key].get_name()
@@ -398,6 +417,7 @@ def endProgram():
 
     #write the shopping cart information to the file
     shoppingCartInformation = []
+
     while not shoppingCart.isEmpty():
         shoppingCartObj = shoppingCart.removeLast()
         pID = shoppingCartObj.get_id()
@@ -421,7 +441,147 @@ def endProgram():
         cartHistoryInformation.append([pID,pName,pPrice,pQuantity])
     #write cartHistory info to file
     file.write("cartHistoryInformation = " + str(cartHistoryInformation) + "\n")
+
+    #add user accounts information
+    userAccountInformation = []
+
+    for key in userAccounts:
+        UAName = userAccounts[key].get_user_name()
+        UAPass = userAccounts[key].get_password()
+        UABalance = userAccounts[key].get_balance()
+        UAAccountType = userAccounts[key].get_account_type()
+
+        UAShoppingCart = []
+        while not currentUser.get_shopping_cart().isEmpty():
+            shoppingCartObj = currentUser.get_shopping_cart().removeLast()
+            pID = shoppingCartObj.get_id()
+            pName = shoppingCartObj.get_name()
+            pPrice = shoppingCartObj.get_price()
+            pQuantity = shoppingCartObj.get_quantity()
+            UAShoppingCart.append([pID, pName, pPrice, pQuantity])
+
+        UACartHistory = []
+        while not currentUser.get_cart_history().isEmpty():
+            cartHistoryObj = currentUser.get_cart_history().pop()
+            pID = cartHistoryObj.get_id()
+            pName = cartHistoryObj.get_name()
+            pPrice = cartHistoryObj.get_price()
+            pQuantity = cartHistoryObj.get_quantity()
+            UACartHistory.append([pID, pName, pPrice, pQuantity])
+
+        userAccountInformation.append([UAName,UAPass,UABalance,UAAccountType,UAShoppingCart,UACartHistory])
+
+    file.write("userAccountInformation = " + str(userAccountInformation) + "\n")
+
+
     #close the file
     file.close()
+
+#add user functionality
+def login():
+    #get the keys of the user account dictionary
+    userAccountKeys = userAccounts.keys()
+
+    #ask user for username and password.
+    userName = askForUserInput("Username: ", "string")
+    password = askForUserInput("Password: ", "string")
+    #search for the username in the dictionary
+    while userName not in userAccountKeys or password != userAccounts[userName].get_password():
+        #tell user the username or password is wrong and ask for new username and password
+        print("Incorrect username or password")
+        tryAgain = askForUserInput("Try Again (enter positive number for yes, negative number for no)? ",
+                                   "float")
+        if tryAgain < 0:
+            return
+        userName = askForUserInput("Username: ", "string")
+        password = askForUserInput("Password: ", "string")
+
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    currentUser = userAccounts[userName]
+
+def signUp():
+    #ask the user for a username and password
+    userName = askForUserInput("Username: ", "string")
+    password = askForUserInput("Password: ", "string")
+    checkPassword = askForUserInput("Re-enter Password: ", "string")
+
+    #ask the user to enter a new password if the two passwords do not match
+    while password != checkPassword:
+        print("Passwords do not match. Please re-enter your password")
+        password = askForUserInput("Password: ", "string")
+        checkPassword = askForUserInput("Re-enter Password: ", "string")
+
+    #create user account
+    newAccount = UserAccount(userName, password, 0, "user")
+    #store account in dictionary
+    userAccounts[newAccount.get_user_name()] = newAccount
+
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    print("previours current user: " + str(currentUser))
+    #set current user to new user
+    currentUser = newAccount
+    print("new current user: " + currentUser.get_user_name())
+
+def signOut():
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    currentUser = guestAccount
+
+
+
+#use this function to get user input
+def askForUserInput(strMessage, type):
+    #store user input in a variable & check if all characters are digits
+    userInput = input(strMessage)
+
+    #print("type entered: " + type)
+
+    match type:
+
+        case "string":
+            #print("returning a string")
+            return userInput
+        case "int":
+            #print("returning an int")
+
+            # replace "." in potential string with "" to better test string with isDigit() function
+            # Credit for idea: https://pythonhow.com/how/check-if-a-string-is-a-float/
+            testInput = userInput.replace(".", "")
+            testInput = userInput.replace("-", "")
+            #Check if user input is a number. if not, make them enter a valid number
+            while not testInput.isdigit():
+                print("Please enter a valid number")
+                userInput = input(strMessage)
+                testInput = userInput.replace(".", "")
+                testInput = userInput.replace("-", "")
+
+                # check if user input is an integer. if not, that is it contains a "." in the number, repeat the function
+                # for the user to enter an integer.
+            if "." in userInput:
+                print("Please enter an integer")
+                userInput = askForUserInput(strMessage, type)
+            return int(userInput)
+        case "float":
+            #print("returning a float")
+
+            # replace "." in potential string with "" to better test string with isDigit() function
+            # Credit for idea: https://pythonhow.com/how/check-if-a-string-is-a-float/
+            testInput = userInput.replace(".", "")
+            testInput = testInput.replace("-", "")
+
+            #print("testinput:" + str(testInput))
+
+            # Check if user input is a number. if not, make them enter a valid number
+            while not testInput.isdigit():
+                print("Please enter a valid number")
+                userInput = input(strMessage)
+                testInput = userInput.replace(".", "")
+            return float(userInput)
+        case __:
+            raise Exception("Error: 'type' argument is invalid. Valid types:\nstring\nint\nfloat")
+
+
 
 main()

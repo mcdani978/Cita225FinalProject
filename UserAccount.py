@@ -92,6 +92,10 @@ class UserAccount:
             self.__shoppingCart = newShoppingCart
         else:
             raise Exception("shoppingCart is not of type LinkedList")
+    def add_to_shopping_cart(self, element):
+        self.__shoppingCart.add(element)
+    def remove_from_shopping_cart(self, element):
+        self.__shoppingCart.remove(element)
     def set_account_type(self, newAccountType):
         #check if parameter is acceptable account type
         if newAccountType in acceptableAccountTypes:
@@ -105,6 +109,10 @@ class UserAccount:
             self.__cartHistory = newCartHistory
         else:
             raise Exception("Cart History is not of type Stack")
+    def add_to_cart_history(self, element):
+        self.__cartHistory.push(element)
+    def remove_from_cart_history(self):
+        self.__cartHistory.pop()
 
     def deposit(self, amount):
         self.__balance += amount

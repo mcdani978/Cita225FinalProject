@@ -1,67 +1,73 @@
-#to save data over sessions, you need ot write the product information to 
-
-
 #this program will store the main process of the project.
 from Product import Product
 from LinkedList import LinkedList
 from Stack import Stack
 #get the savedData.py file information
 from savedData import *
+#Get user account class
+from UserAccount import UserAccount
+#get Functionalities class
+from Functionalities import Functionalities
 
 #create empty dictionary to store products with their ID as a key & the object as the value.
 #this INCLUDES the objects of the products
 productDictionary = {}
 #create empty list to store product names & organize the products. This DOES NOT INCLUDE the objects of the products
 productList = []
-#create empty linked list for shopping cart functionalities. This INCLUDES the product objects
-shoppingCart = LinkedList()
-#create stack object to hold all additions and deletions from the cart. this INCLUDES the product objects
-cartHistory = Stack()
+#cerate Dictionary for the user accounts
+userAccounts = {}
+
+#create guest and admin accounts for user functionality
+guestAccount = UserAccount("guest", "123", 0, "guest")
+
+#initialize the user account to guest when program starts
+currentUser = guestAccount
+
+STR_GUEST = "guest"
+STR_USER = "user"
+STR_ADMIN = "admin"
+STR_ADMIN_PASSWORD = "CITA225"
+
+#store functionality objects in a list.
+functionalities = [
+    Functionalities("add_product","Add Product",[STR_ADMIN]),
+    Functionalities("remove_product","Remove Product",[STR_ADMIN]),
+    Functionalities("update_product_quantity","Update Product Quantity",[STR_ADMIN]),
+    Functionalities("add_to_cart","Add To Cart",[STR_GUEST, STR_USER]),
+    Functionalities("remove_from_cart","Remove From Cart",[STR_GUEST, STR_USER]),
+    Functionalities("undo_remove_from_cart","Undo Remove From Cart",[STR_GUEST, STR_USER]),
+    Functionalities("display_inventory","Display Inventory",[STR_GUEST, STR_USER, STR_ADMIN]),
+    Functionalities("display_cart","Display Cart",[STR_GUEST, STR_USER]),
+    Functionalities("login","Login",[STR_GUEST]),
+    Functionalities("sign_up","Sign Up",[STR_GUEST]),
+    Functionalities("sign_out","Sign Out",[STR_USER, STR_ADMIN]),
+    Functionalities("delete_account","Delete Account",[STR_USER]),
+    Functionalities("get_user_names","Get User Names",[STR_ADMIN]),
+    Functionalities("set_admin_permission","Set Admin Permission",[STR_USER]),
+    Functionalities("change_user_name","Change User Name",[STR_USER, STR_ADMIN]),
+    Functionalities("change_password","Change Password",[STR_USER]),
+    Functionalities("check_account_information","Check Account Info",[STR_GUEST,STR_USER]),
+    Functionalities("proceed_to_checkout", "Proceed To Checkout", [STR_USER]),
+    Functionalities("add_funds", "Add Funds", [STR_GUEST,STR_USER])
+]
 
 def main():
     #initialize the program information
-    initializeProgram()
+    initialize_program()
 
+    continueProgram = True
     #loop main function.
-    while True:
-        print("\n\n\n\n1. Add product\n2. Remove product \n3. Update Product Quantity\n4. Add to Cart"
-              "\n5. Remove from Cart\n6. Undo Remove from Cart\n7. Display Inventory\n8. Display Cart\nDefault:"
-              "Exit Program.\n")
+    while continueProgram:
+        continueProgram = display_options()
 
-        #Max selection is the number of functionalities the user has to choose from.
-        maxSelection = 8
+    end_program()
 
-        #gather user input
-        userInput = askForUserInput("Please enter your Option: ", "int")
-
-        #match functionality to the given input. functionalities are given by their number as listed above
-        match userInput:
-            case 1:
-                addProduct()
-            case 2:
-                removeProduct()
-            case 3:
-                updateProductQuantity()
-            case 4:
-                addToCart()
-            case 5:
-                removeFromCart()
-            case 6:
-                undoRemoveFromCart()
-            case 7:
-                displayInventory()
-            case 8:
-                displayCart()
-            case __:
-                endProgram()
-                return
-
-#methods to add to main:
-def addProduct():
+#permissions: admin
+def add_product():
     #this method should create a new product object with ID, Price, Name, & Quantity
     #ask user to enter values for a new product
 
-    pID = askForUserInput("Please enter the product ID, or type -1 to exit: ", "int")
+    pID = ask_for_user_input("Please enter the product ID, or type -1 to exit: ", "int")
 
     #exit if input is negative
     if pID < 0:
@@ -70,12 +76,12 @@ def addProduct():
     #if ID already exists, ask user to enter a different ID
     while pID in productDictionary:
         print("ID already exists. Please enter a different ID")
-        pID = askForUserInput("Please enter the product ID, or type -1 to exit: ", "int")
+        pID = ask_for_user_input("Please enter the product ID, or type -1 to exit: ", "int")
         # exit if input is negative
         if pID < 0:
             return
 
-    pName = askForUserInput("Please enter the product Name,or type -1 to exit: ", "string")
+    pName = ask_for_user_input("Please enter the product Name,or type -1 to exit: ", "string")
     pName = pName.lower()
 
     #exit if input is negative
@@ -86,20 +92,20 @@ def addProduct():
     #if name already exists in productlist, ask user to enter a different name. this should igore case sensitivity
     while pName in productList:
         print("name already exists. Please enter a different name")
-        pName = askForUserInput("Please enter the product Name, or type -1 to exit: ", "string")
+        pName = ask_for_user_input("Please enter the product Name, or type -1 to exit: ", "string")
         pName = pName.lower()
 
         # exit if input is negative
         if pName == "-1":
             return
 
-    pPrice = askForUserInput("Please enter the product price, or type -1 to exit: ", "float")
+    pPrice = ask_for_user_input("Please enter the product price, or type -1 to exit: ", "float")
 
     # exit if input is negative
     if pPrice < 0:
         return
 
-    pQuantity = askForUserInput("Please enter the quantity of the product, or type -1 to exit: ", "int")
+    pQuantity = ask_for_user_input("Please enter the quantity of the product, or type -1 to exit: ", "int")
 
     # exit if input is negative
     if pQuantity < 0:
@@ -114,9 +120,11 @@ def addProduct():
     #add product name to list
     productList.append(newProduct.get_name())
 
-def removeProduct():
+#permissions: admin
+def remove_product():
+    display_inventory()
     #remove the product from the list & dictionary
-    userInput = askForUserInput("Please enter the product ID you want to remove, "
+    userInput = ask_for_user_input("Please enter the product ID you want to remove, "
                                 "or type -1 to exit: ", "int")
 
     if userInput < 0:
@@ -125,7 +133,7 @@ def removeProduct():
     #check if item is in the dictionary. if not, ask user to enter a different value
     while userInput not in productDictionary:
         print("Product ID not found. Please enter a different ID")
-        userInput = askForUserInput("Please enter the product ID you want to remove, "
+        userInput = ask_for_user_input("Please enter the product ID you want to remove, "
                                     "or type -1 to exit: ", "int")
         if userInput < 0:
             return
@@ -137,9 +145,10 @@ def removeProduct():
     productDictionary.pop(userInput)
     productList.remove(pName)
 
-def updateProductQuantity():
+#permissions: admin
+def update_product_quantity():
     #remove the product from the list & dictionary
-    userInput = askForUserInput("Please enter the product ID for the product you wish to update, "
+    userInput = ask_for_user_input("Please enter the product ID for the product you wish to update, "
                                 "or type -1 to exit: ", "int")
 
     if userInput < 0:
@@ -148,20 +157,20 @@ def updateProductQuantity():
     #check if item is in the dictionary. if not, ask user to enter a different value
     while userInput not in productDictionary:
         print("Product ID not found. Please enter a different ID")
-        userInput = askForUserInput("Please enter the product ID you want to remove, "
+        userInput = ask_for_user_input("Please enter the product ID you want to remove, "
                                     "or type -1 to exit: ", "int")
         if userInput < 0:
             return
 
     #ask user for new quantity for the product
-    newQuantity = askForUserInput("please enter the new quantity of the product: ", "int")
+    newQuantity = ask_for_user_input("please enter the new quantity of the product: ", "int")
 
     if newQuantity < 0:
         return
 
     while newQuantity < 0:
         print("Invalid quantity. Please enter a positive integer")
-        newQuantity = askForUserInput("please enter the new quantity of the product, "
+        newQuantity = ask_for_user_input("please enter the new quantity of the product, "
                                       "or type -1 to exit", "int")
         if newQuantity < 0:
             return
@@ -169,14 +178,15 @@ def updateProductQuantity():
     #update quantity of the product
     productDictionary[userInput].set_quantity(newQuantity)
 
-def addToCart():
+#permissions: guest, user
+def add_to_cart():
     #loop until the user doesn't want to continue shopping
     while True:
         #each node will be a Product added to the cart.
         #Display all products & let user choose product they want.
         for index in range(len(productList)):
             print(f"{index}. " + productList[index])
-        userInput = askForUserInput("please choose an item you want to add to cart, "
+        userInput = ask_for_user_input("please choose an item you want to add to cart, "
                                     "or type -1 to exit", "int")
 
         if userInput < 0:
@@ -185,14 +195,14 @@ def addToCart():
             print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
             for index in range(len(productList)):
                 print(f"{index}. " + productList[index])
-            userInput = askForUserInput("please choose an item you want to add to cart, "
+            userInput = ask_for_user_input("please choose an item you want to add to cart, "
                                         "or type -1 to exit", "int")
             if userInput < 0:
                 return
 
         #find user option in productDictionary.
         for key in productDictionary:
-            #store object in a temporary variable. Python doesn't like to behave sometimes
+            #store object in a temporary variable.
             tempObj = productDictionary[key]
 
             if tempObj.get_name() == productList[userInput]:
@@ -203,12 +213,13 @@ def addToCart():
                 else:
                     # add to shopping cart
                     print("adding to cart...")
-                    shoppingCart.add(tempObj)
+                    currentUser.add_to_shopping_cart(tempObj)
                     #remove 1 quantity from the object
                     tempObj.remove_quantity(1)
                     break; #no need to continue looping
 
-def removeFromCart():
+#permissions: guest, user
+def remove_from_cart():
     #loop until user doesn't want to remove a product
     while True:
         #remove first occurrence of an item from the cart, add 1 quantity back to the product, add action to cart history
@@ -217,7 +228,7 @@ def removeFromCart():
             print(f"{index}. " + productList[index])
         #ask user what they want to remove
 
-        userInput = askForUserInput("What product from cart do you want to remove?, "
+        userInput = ask_for_user_input("What product from cart do you want to remove?, "
                                     "or type -1 to exit", "int")
         if userInput < 0:
             return
@@ -225,7 +236,7 @@ def removeFromCart():
             print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
             for index in range(len(productList)):
                 print(f"{index}. " + productList[index])
-            userInput = askForUserInput("please choose an item you want to add to cart, "
+            userInput = ask_for_user_input("please choose an item you want to add to cart, "
                                         "or type -1 to exit", "int")
             if userInput < 0:
                 return
@@ -234,20 +245,22 @@ def removeFromCart():
         for key in productDictionary:
             if productList[userInput] == productDictionary[key].get_name():
                 #remove LAST occurrence of product from list
-                if not shoppingCart.remove(productDictionary[key]):
+
+                if not currentUser.get_shopping_cart().remove(productDictionary[key]):
                     print("item not in cart")
                 else:
                     print("Removing...")
                     #add product back to shelf
                     productDictionary[key].add_quantity(1)
-                    #add action to stack history
-                    cartHistory.push(productDictionary[key])
+                    #add action to user history
+                    currentUser.add_to_cart_history(productDictionary[key])
 
-def undoRemoveFromCart():
+#permissions: guest, user
+def undo_remove_from_cart():
     #check if product is in stock before adding back to cart
 
     #store object in variable
-    addBackToCart = cartHistory.pop()
+    addBackToCart = currentUser.get_cart_history().pop()
 
     #check if item has been popped from cart
     if addBackToCart!= None:
@@ -255,7 +268,7 @@ def undoRemoveFromCart():
         if addBackToCart.get_quantity() > 0:
             #add back to cart
             print("adding to cart...")
-            shoppingCart.add(addBackToCart)
+            currentUser.get_shopping_cart().add(addBackToCart)
             # remove 1 quantity from the object
             addBackToCart.remove_quantity(1)
         else:
@@ -263,16 +276,166 @@ def undoRemoveFromCart():
     else:
         print("No action in history")
 
-def displayInventory():
+#permissions: guest, user, admin
+def display_inventory():
     for key in productDictionary:
         print(productDictionary[key])
         print()
 
-def displayCart():
+#permissions: guest, user
+def display_cart():
     #print the shopping cart
-    print(shoppingCart)
+    print(currentUser.get_shopping_cart())
 
-def askForUserInput(strMessage, type):
+#permissions: guest
+def login():
+    #get the keys of the user account dictionary
+    userAccountKeys = userAccounts.keys()
+
+    #ask user for username and password.
+    userName = ask_for_user_input("Username: ", "string")
+    password = ask_for_user_input("Password: ", "string")
+    #search for the username in the dictionary
+    while userName not in userAccountKeys or password != userAccounts[userName].get_password():
+        #tell user the username or password is wrong and ask for new username and password
+        print("Incorrect username or password")
+        tryAgain = ask_for_user_input("Try Again (enter positive number for yes, negative number for no)? ",
+                                   "float")
+        if tryAgain < 0:
+            return
+        userName = ask_for_user_input("Username: ", "string")
+        password = ask_for_user_input("Password: ", "string")
+
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    currentUser = userAccounts[userName]
+
+    #add guest shopping cart and cart history to current user's shopping cart and cart history
+    while not guestAccount.get_shopping_cart().isEmpty():
+        currentUser.add_to_shopping_cart(guestAccount.get_shopping_cart().removeFirst())
+#        currentUser.get_shopping_cart().add(guestAccount.get_shopping_cart().removeFirst())
+    while not guestAccount.get_cart_history().isEmpty():
+        currentUser.add_to_cart_history(guestAccount.get_cart_history().pop())
+#        currentUser.get_cart_history().push(guestAccount.get_cart_history().pop())
+
+#permissions: guest
+def sign_up():
+    #get the keys in the current userAccounts dictionary
+    userAccountNames = userAccounts.keys()
+
+    #ask the user for a username and password
+    userName = ask_for_user_input("Username: ", "string")
+    while userName in userAccountNames:
+        print("Username already taken. Please enter a different username")
+        userName = ask_for_user_input("Username: ", "string")
+
+    password = ask_for_user_input("Password: ", "string")
+    checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+
+    #ask the user to enter a new password if the two passwords do not match
+    while password != checkPassword:
+        print("Passwords do not match. Please re-enter your password")
+        password = ask_for_user_input("Password: ", "string")
+        checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+
+    #create user account
+    newAccount = UserAccount(userName, password, 0, "user",
+                             guestAccount.get_shopping_cart(), guestAccount.get_cart_history())
+    #store account in dictionary
+    userAccounts[newAccount.get_user_name()] = newAccount
+
+    #delete guest account shopping cart and cart history
+    guestAccount.set_shopping_cart(LinkedList())
+    guestAccount.set_cart_history(Stack())
+
+
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    print("previours current user: " + currentUser.get_user_name())
+    #set current user to new user
+    currentUser = newAccount
+    print("new current user: " + currentUser.get_user_name())
+
+#permissions: user, admin
+def sign_out():
+    #declare currentUser variable global before using to bypass making it a local variable
+    global currentUser
+    currentUser = guestAccount
+
+#permissions: user
+def delete_account():
+    deleteString = "DELETE"
+    print("Are you sure you want to delete your account?\nTpye '" + deleteString + "' to delete your account, or type 'no' to exit")
+    userInput = ask_for_user_input("", "string")
+
+    while userInput != deleteString:
+        if userInput == "no":
+            return
+        print("invalid input. Please enter '" + deleteString + "' to delete your account, or type 'no' to exit")
+        userInput = ask_for_user_input("", "string")
+
+    global currentUser
+    userAccounts.pop(currentUser.get_user_name())
+    currentUser = guestAccount
+
+#permissions: admin
+def get_user_names():
+    #print the usernames, separated by lines
+    for key in userAccounts:
+        print(key)
+
+#permissions: user
+def set_admin_permission():
+    #if the account enters the correct admin password, set account type to admin
+    userInput = ask_for_user_input("Please enter the password, or type 'no' to exit: ", "string")
+    while userInput != STR_ADMIN_PASSWORD:
+        if userInput == "no":
+            return
+        else:
+            print("Incorrect password.")
+            userInput = ask_for_user_input("Please enter the password, or type 'no' to exit: ", "string")
+    #if you got this far, you get to be an admin!
+    currentUser.set_account_type("admin")
+
+#permissions: user, admin
+def change_user_name():
+    userInput = ask_for_user_input("New Username: ", "string")
+    currentUser.set_user_name(userInput)
+
+#permissions: user
+def change_password():
+    #ask user for their password, then ask for new password and to re-enter the new password
+    currentPassword = currentUser.get_password()
+    userInput = ask_for_user_input("Please enter your password, or type 'no' to exit", "string")
+
+    while userInput != currentPassword:
+        print("Incorrect password")
+        userInput = ask_for_user_input("Please enter your password, or type 'no' to exit", "string")
+
+    newPassword = ask_for_user_input("Password: ", "string")
+    checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+
+    #ask the user to enter a new password if the two passwords do not match
+    while newPassword != checkPassword:
+        print("Passwords do not match. Please re-enter your password")
+        newPassword = ask_for_user_input("Password: ", "string")
+        checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+
+    currentUser.set_password(newPassword)
+
+#permissions: guest, user
+def check_account_information():
+    print(currentUser)
+
+#permissions: user
+def proceed_to_checkout():
+    return
+#permissions: guest, user
+def add_funds():
+    return
+
+#use this function to get user input
+def ask_for_user_input(strMessage, type):
     #store user input in a variable & check if all characters are digits
     userInput = input(strMessage)
 
@@ -295,12 +458,13 @@ def askForUserInput(strMessage, type):
                 print("Please enter a valid number")
                 userInput = input(strMessage)
                 testInput = userInput.replace(".", "")
+                testInput = userInput.replace("-", "")
 
                 # check if user input is an integer. if not, that is it contains a "." in the number, repeat the function
                 # for the user to enter an integer.
             if "." in userInput:
                 print("Please enter an integer")
-                userInput = askForUserInput(strMessage, type)
+                userInput = ask_for_user_input(strMessage, type)
             return int(userInput)
         case "float":
             #print("returning a float")
@@ -320,14 +484,51 @@ def askForUserInput(strMessage, type):
             return float(userInput)
         case __:
             raise Exception("Error: 'type' argument is invalid. Valid types:\nstring\nint\nfloat")
-
-
-
 #initializeProgram will retrieve all data from savedData.py file to initialize the list, dictionary, shopping cart,
 #and the cart history.
-def initializeProgram():
+def display_options():
+    print("\n\n\n")
+    # display the current user and account type
+    print(currentUser.get_user_name())
+    #print("current acct type: " + currentUser.get_account_type())
+    #store current user's account type
+    currentAccountType = currentUser.get_account_type()
+
+    #create supported functionalities list
+    supportedFunctionalities = []
+    #loop through functionalities and append the functionalities to the supported functionalities list
+
+    for index in range(len(functionalities)):
+        if currentAccountType in functionalities[index].get_functionality_permissions():
+            supportedFunctionalities.append(functionalities[index])
+
+
+    #loop through functionalities and display options to the user
+
+#    for index in range(len(supportedFunctionalities)):
+ #       print(str(index + 1) + ". " + supportedFunctionalities[index][0])
+    for index in range(len(supportedFunctionalities)):
+        print(str(index + 1) + ". " + supportedFunctionalities[index].get_functionality_text())
+
+    print("Default: Exit Program")
+
+    userInput = ask_for_user_input("Please enter your Option: ", "int")
+
+    if userInput-1 not in range(len(supportedFunctionalities)):
+        return False
+    else:
+        print("\n\n\n")
+        #Credit for idea: ChatGPT.
+        #Given Prompt: I am programming in Python. I want to call a function in my file by using a string. How can I do that?
+        if (supportedFunctionalities[userInput-1].get_functionality_name() in globals() and
+                callable(globals()[supportedFunctionalities[userInput-1].get_functionality_name()])):
+
+             globals()[supportedFunctionalities[userInput-1].get_functionality_name()]()
+    return True
+
+def initialize_program():
     #set the productDictionary from dictionary information given by savedData.py
-    #read each element in the 2-d list, create the object given the information, & store that in the dictionary
+    #read each element in the 2-d list, create the product given the information, & store that in the dictionary
     for i in range(len(dictionaryInformation)):
         list = dictionaryInformation[i]
         pID = list[0]
@@ -343,37 +544,58 @@ def initializeProgram():
     for element in listInformation:
         productList.append(element)
 
-    #set the shoppingCart from shoppingCartInformation given by savedData.py
-    for row in shoppingCartInformation:
+
+    #set the userAccounts dictionary from the userAccountInformation list given by SavedData.py
+    #print(userAccountInformation)
+    for row in userAccountInformation:
         #store info in respective variables
-        pID = row[0]
-        pName = row[1]
-        pPrice = row[2]
-        pQuantity = row[3]
+        UAName = row[0]
+        UAPassword = row[1]
+        UABalance = row[2]
+        UAAccountType = row[3]
 
-        #create temporary object
-        tempObj = Product(pID,pName,pPrice,pQuantity)
-        #send object to shopping cart list
-        shoppingCart.add(tempObj)
 
-    #set the cartHistory from cartHistoryInformation given by savedData.py
-    #reverse order of cartHistoryInformation. first in is last element in list
-    cartHistoryInformation.reverse()
-    for row in cartHistoryInformation:
-        #store info in respective variables
-        pID = row[0]
-        pName = row[1]
-        pPrice = row[2]
-        pQuantity = row[3]
+        shoppingCartObj = LinkedList()
+        #loop through 2-d lists and create objects to store in linked list object
+        UAShoppingCart = row[4]
+        for i in UAShoppingCart:
+            # store info in respective variables
+            pID = i[0]
+            pName = i[1]
+            pPrice = i[2]
+            pQuantity = i[3]
 
-        #create temporary object
-        tempObj = Product(pID,pName,pPrice,pQuantity)
-        #send obejct to cartHistory
-        cartHistory.push(tempObj)
+            # create temporary object
+            tempShoppingCartProduct = Product(pID, pName, pPrice, pQuantity)
+            shoppingCartObj.add(tempShoppingCartProduct)
+
+
+        cartHistoryObj = Stack()
+        #loop through the 2d lists and create objects to store in stack object
+        UACartHistory = row[5]
+        # set the cartHistory from cartHistoryInformation given by savedData.py
+        # reverse order of cartHistoryInformation. first in is last element in list
+        UACartHistory.reverse()
+        for j in UACartHistory:
+            # store info in respective variables
+            pID = j[0]
+            pName = j[1]
+            pPrice = j[2]
+            pQuantity = j[3]
+            # create temporary object
+            tempCartHistoryProduct = Product(pID, pName, pPrice, pQuantity)
+            # send obejct to cartHistory
+            cartHistoryObj.push(tempCartHistoryProduct)
+
+        #create the UserAccount object
+        tempObj = UserAccount(UAName,UAPassword,UABalance,UAAccountType,shoppingCartObj,cartHistoryObj)
+
+        #send object to userAccounts dictionary
+        userAccounts[UAName] = tempObj
 
 #end program will save all user data to a python file. saved data will include the list, dictionary, shopping cart,
 #and the cart history.
-def endProgram():
+def end_program():
     file = open("savedData.py", "w")
 
     #to save an object to the file, you need to get each attribute out of the object & send the information over.
@@ -382,6 +604,7 @@ def endProgram():
 
     #add productDictionary information
     objectList = []
+
     for key in productDictionary:
         pID = productDictionary[key].get_id()
         pName = productDictionary[key].get_name()
@@ -396,31 +619,37 @@ def endProgram():
     #write product list to the file
     file.write("listInformation = " + str(productList) + "\n")
 
-    #write the shopping cart information to the file
-    shoppingCartInformation = []
-    while not shoppingCart.isEmpty():
-        shoppingCartObj = shoppingCart.removeLast()
-        pID = shoppingCartObj.get_id()
-        pName = shoppingCartObj.get_name()
-        pPrice = shoppingCartObj.get_price()
-        pQuantity = shoppingCartObj.get_quantity()
-        shoppingCartInformation.append([pID,pName,pPrice,pQuantity])
+    #add user accounts information
+    userAccountInformation = []
 
-    #add shoppingCartInfo to the file
-    file.write("shoppingCartInformation = " + str(shoppingCartInformation) + "\n")
+    for key in userAccounts:
+        UAName = userAccounts[key].get_user_name()
+        UAPass = userAccounts[key].get_password()
+        UABalance = userAccounts[key].get_balance()
+        UAAccountType = userAccounts[key].get_account_type()
 
-    #add cart history to the shopping cart
-    cartHistoryInformation = []
+        UAShoppingCart = []
+        while not currentUser.get_shopping_cart().isEmpty():
+            shoppingCartObj = currentUser.get_shopping_cart().removeLast()
+            pID = shoppingCartObj.get_id()
+            pName = shoppingCartObj.get_name()
+            pPrice = shoppingCartObj.get_price()
+            pQuantity = shoppingCartObj.get_quantity()
+            UAShoppingCart.append([pID, pName, pPrice, pQuantity])
 
-    while not cartHistory.isEmpty():
-        cartHistoryObj = cartHistory.pop()
-        pID = cartHistoryObj.get_id()
-        pName = cartHistoryObj.get_name()
-        pPrice = cartHistoryObj.get_price()
-        pQuantity = cartHistoryObj.get_quantity()
-        cartHistoryInformation.append([pID,pName,pPrice,pQuantity])
-    #write cartHistory info to file
-    file.write("cartHistoryInformation = " + str(cartHistoryInformation) + "\n")
+        UACartHistory = []
+        while not currentUser.get_cart_history().isEmpty():
+            cartHistoryObj = currentUser.get_cart_history().pop()
+            pID = cartHistoryObj.get_id()
+            pName = cartHistoryObj.get_name()
+            pPrice = cartHistoryObj.get_price()
+            pQuantity = cartHistoryObj.get_quantity()
+            UACartHistory.append([pID, pName, pPrice, pQuantity])
+
+        userAccountInformation.append([UAName,UAPass,UABalance,UAAccountType,UAShoppingCart,UACartHistory])
+
+    file.write("userAccountInformation = " + str(userAccountInformation) + "\n")
+
     #close the file
     file.close()
 

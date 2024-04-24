@@ -323,6 +323,8 @@ class AddToCartWindow:
                         if not found_in_cart:
                             # Add the item to the cart
                             self.cart.append((selected_product, quantity))
+                            # Record the recently added item
+                            self.recently_added.append((selected_product, quantity))
 
                         messagebox.showinfo("Success",
                                             f"{quantity} {selected_product.get_name()} added to cart.")

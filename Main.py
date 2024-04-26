@@ -41,14 +41,14 @@ functionalities = [
     Functionalities("login","Login",[STR_GUEST]),
     Functionalities("sign_up","Sign Up",[STR_GUEST]),
     Functionalities("sign_out","Sign Out",[STR_USER, STR_ADMIN]),
-    Functionalities("delete_account","Delete Account",[STR_USER]),
+    Functionalities("delete_account","Delete Account",[STR_USER, STR_ADMIN]),
     Functionalities("get_user_names","Get User Names",[STR_ADMIN]),
     Functionalities("set_admin_permission","Set Admin Permission",[STR_USER]),
     Functionalities("change_user_name","Change User Name",[STR_USER, STR_ADMIN]),
     Functionalities("change_password","Change Password",[STR_USER]),
     Functionalities("check_account_information","Check Account Info",[STR_GUEST,STR_USER]),
     Functionalities("proceed_to_checkout", "Proceed To Checkout", [STR_USER]),
-    Functionalities("add_funds", "Add Funds", [STR_GUEST,STR_USER])
+    Functionalities("add_funds", "Add Funds", [STR_USER])
 ]
 
 def main():
@@ -314,16 +314,19 @@ def undo_remove_from_cart():
             print("Adding back to cart")
             #find product in current user's shopping cart and add the respective quantity back to the cart
             index = 0
-            while index < currentUser.get_shopping_cart().getSize():
+            while index <= currentUser.get_shopping_cart().getSize():
                 #check if the ID of the product to add match the index of the product
                 if addBackToCart.get_id() == currentUser.get_shopping_cart().get(index).get_id():
                     #add back to the quantity of that product
                     currentUser.get_shopping_cart().get(index).add_quantity(1)
                     break; #no need to continue looping
                 else:
-                    #create new object qith respective quantity and append to the the user's shopping cart
-                    newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name, addBackToCart.get_price, 1)
-                    currentUser.get_shopping_cart().addLast(newProduct)
+                    if index == currentUser.get_shopping_cart().getSize():
+                        #create new object qith respective quantity and append to the the user's shopping cart
+                        newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name, addBackToCart.get_price, 1)
+                        currentUser.get_shopping_cart().addLast(newProduct)
+                        break; #no need to continue looping
+                index += 1
     else:
         print("No action in history")
 

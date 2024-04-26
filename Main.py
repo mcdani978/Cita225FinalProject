@@ -186,37 +186,71 @@ def add_to_cart():
         #Display all products & let user choose product they want.
         for index in range(len(productList)):
             print(f"{index}. " + productList[index])
-        userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                    "or type -1 to exit", "int")
 
+
+        #ask the user what product to add to cart
+        userInput = ask_for_user_input("please choose an item you want to add to cart, "
+                                    "or type -1 to exit: ", "int")
         if userInput < 0:
             return
+        #check for valid input
         while userInput >= len(productList):
             print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
             for index in range(len(productList)):
                 print(f"{index}. " + productList[index])
             userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                        "or type -1 to exit", "int")
+                                        "or type -1 to exit: ", "int")
             if userInput < 0:
                 return
+
 
         #find user option in productDictionary.
         for key in productDictionary:
             #store object in a temporary variable.
             tempObj = productDictionary[key]
 
+            #check if the user input corresponds to an existing product
             if tempObj.get_name() == productList[userInput]:
                 #check if the store has ran out of the product
                 if tempObj.get_quantity() == 0:
                     print("Sorry, we are out of that product")
                     break; #no need to continue looping
                 else:
-                    # add to shopping cart
-                    print("adding to cart...")
-                    currentUser.add_to_shopping_cart(tempObj)
-                    #remove 1 quantity from the object
-                    tempObj.remove_quantity(1)
-                    break; #no need to continue looping
+                    #store current user's shopping cart in temporary cart
+                    tempCart = currentUser.get_shopping_cart()
+                    #iterate through the shopping cart, comparing the tempObj's ID to the current ID in the cart
+                    index = 0
+                    #check if cart is empty. if it is, simply add new item to cart
+                    if tempCart.isEmpty():
+                        print("adding to empty cart...")
+                        # create new product & append to the temporary cart.
+                        newProduct = Product(tempObj.get_id(), tempObj.get_name(), tempObj.get_price(), 1)
+                        # append object to cart
+                        tempCart.addLast(newProduct)
+                        tempObj.remove_quantity(1)
+                        break; #no need to continue looping
+
+                    while index < tempCart.getSize():
+                        #compare the ID of the tempObj to the ID of the object in cart
+                        if tempObj.get_id() == tempCart.get(index).get_id():
+                            print("adding to existing item...")
+                            #add 1 to quantity of the object in cart & remove 1 from the product in the dictionary
+                            tempCart.get(index).add_quantity(1)
+                            tempObj.remove_quantity(1)
+                            break; #no need to continue looping
+                        else:
+                            #check if the object is last in cart. If so, we need to add a new product to the cart
+                            if index == tempCart.getSize()-1:
+                                print("adding new item to cart...")
+                                #create new product & append to the temporary cart.
+                                newProduct = Product(tempObj.get_id(), tempObj.get_name(), tempObj.get_price(), 1)
+                                #append object to cart
+                                tempCart.addLast(newProduct)
+                                #remove 1 from product in dictionary
+                                tempObj.remove_quantity(1)
+                                break; #no need to continue looping
+
+                        index += 1
 
 #permissions: guest, user
 def remove_from_cart():
@@ -224,55 +258,72 @@ def remove_from_cart():
     while True:
         #remove first occurrence of an item from the cart, add 1 quantity back to the product, add action to cart history
         #create list showing products they can remove
-        for index in range(len(productList)):
-            print(f"{index}. " + productList[index])
-        #ask user what they want to remove
 
+        index = 0
+        while index < currentUser.get_shopping_cart().getSize():
+            print(f"{index}. {currentUser.get_shopping_cart().get(index).get_name()}")
+            index += 1
+
+#        for index in range(len(productList)):
+ #           print(f"{index}. " + productList[index])
+
+        #ask user what they want to remove
         userInput = ask_for_user_input("What product from cart do you want to remove?, "
-                                    "or type -1 to exit", "int")
+                                    "or type -1 to exit: ", "int")
         if userInput < 0:
             return
-        while userInput >= len(productList):
+        while userInput >= currentUser.get_shopping_cart().getSize():
             print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
-            for index in range(len(productList)):
-                print(f"{index}. " + productList[index])
+            index = 0
+            while index < currentUser.get_shopping_cart().getSize():
+                print(f"{index}. {currentUser.get_shopping_cart().get(index).get_name()}")
+                index += 1
             userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                        "or type -1 to exit", "int")
+                                        "or type -1 to exit: ", "int")
             if userInput < 0:
                 return
 
-        #check if product is in cart. if not, do nothing, else, remove from cart & add action to history
-        for key in productDictionary:
-            if productList[userInput] == productDictionary[key].get_name():
-                #remove LAST occurrence of product from list
+        #remove 1 quantity of product from cart & add action to history
+        print("removing...")
+        #add action to cart history
+        currentUser.add_to_cart_history(currentUser.get_shopping_cart().get(userInput))
+        #add respective quantity back to the inventory
+        productDictionary[currentUser.get_shopping_cart().get(userInput).get_id()].add_quantity(1)
 
-                if not currentUser.get_shopping_cart().remove(productDictionary[key]):
-                    print("item not in cart")
-                else:
-                    print("Removing...")
-                    #add product back to shelf
-                    productDictionary[key].add_quantity(1)
-                    #add action to user history
-                    currentUser.add_to_cart_history(productDictionary[key])
+
+        currentUser.get_shopping_cart().get(userInput).remove_quantity(1)
+        #if quantity of product is 0, remove product object from cart. (there's no more of that product)
+        if currentUser.get_shopping_cart().get(userInput).get_quantity() == 0:
+            #remove product
+            currentUser.get_shopping_cart().removeAt(userInput)
 
 #permissions: guest, user
 def undo_remove_from_cart():
-    #check if product is in stock before adding back to cart
-
     #store object in variable
     addBackToCart = currentUser.get_cart_history().pop()
-
     #check if item has been popped from cart
-    if addBackToCart!= None:
-        #check if product has been sold out
-        if addBackToCart.get_quantity() > 0:
-            #add back to cart
-            print("adding to cart...")
-            currentUser.get_shopping_cart().add(addBackToCart)
-            # remove 1 quantity from the object
-            addBackToCart.remove_quantity(1)
+    if addBackToCart != None:
+        #check if the inventory is empty
+        if productDictionary[addBackToCart.get_id()].get_quantity() == 0:
+            print("Sorry, we are out of that product")
+            return
         else:
-            print(f"Sorry, we sold out of the product: {addBackToCart.get_name()}")
+            #remove respective quantity from product dictionary
+            productDictionary[addBackToCart.get_id()].remove_quantity(1)
+
+            print("Adding back to cart")
+            #find product in current user's shopping cart and add the respective quantity back to the cart
+            index = 0
+            while index < currentUser.get_shopping_cart().getSize():
+                #check if the ID of the product to add match the index of the product
+                if addBackToCart.get_id() == currentUser.get_shopping_cart().get(index).get_id():
+                    #add back to the quantity of that product
+                    currentUser.get_shopping_cart().get(index).add_quantity(1)
+                    break; #no need to continue looping
+                else:
+                    #create new object qith respective quantity and append to the the user's shopping cart
+                    newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name, addBackToCart.get_price, 1)
+                    currentUser.get_shopping_cart().addLast(newProduct)
     else:
         print("No action in history")
 
@@ -313,10 +364,8 @@ def login():
     #add guest shopping cart and cart history to current user's shopping cart and cart history
     while not guestAccount.get_shopping_cart().isEmpty():
         currentUser.add_to_shopping_cart(guestAccount.get_shopping_cart().removeFirst())
-#        currentUser.get_shopping_cart().add(guestAccount.get_shopping_cart().removeFirst())
     while not guestAccount.get_cart_history().isEmpty():
         currentUser.add_to_cart_history(guestAccount.get_cart_history().pop())
-#        currentUser.get_cart_history().push(guestAccount.get_cart_history().pop())
 
 #permissions: guest
 def sign_up():
@@ -404,22 +453,34 @@ def change_user_name():
 
 #permissions: user
 def change_password():
+    print("Type 'no' at any moment to return to main menu.")
     #ask user for their password, then ask for new password and to re-enter the new password
     currentPassword = currentUser.get_password()
-    userInput = ask_for_user_input("Please enter your password, or type 'no' to exit", "string")
+    userInput = ask_for_user_input("Please enter your password: ", "string")
 
     while userInput != currentPassword:
+        if userInput == "no":
+            return
         print("Incorrect password")
-        userInput = ask_for_user_input("Please enter your password, or type 'no' to exit", "string")
+        userInput = ask_for_user_input("Please enter your password: ", "string")
 
-    newPassword = ask_for_user_input("Password: ", "string")
+    #if user types 'no, return to main menu'
+    newPassword = ask_for_user_input("New Password: ", "string")
+    if newPassword == "no":
+        return
     checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+    if checkPassword == "no":
+        return
 
     #ask the user to enter a new password if the two passwords do not match
     while newPassword != checkPassword:
-        print("Passwords do not match. Please re-enter your password")
-        newPassword = ask_for_user_input("Password: ", "string")
+        print("Passwords do not match. Please re-enter your password, or type 'no' to exit")
+        newPassword = ask_for_user_input("New Password: ", "string")
+        if newPassword == "no":
+            return
         checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+        if checkPassword == "no":
+            return
 
     currentUser.set_password(newPassword)
 
@@ -429,10 +490,13 @@ def check_account_information():
 
 #permissions: user
 def proceed_to_checkout():
+    print("Sorry, this functionality currently does not work")
     return
 #permissions: guest, user
 def add_funds():
+    print("Sorry, this functionality currently does not work")
     return
+
 
 #use this function to get user input
 def ask_for_user_input(strMessage, type):
@@ -489,7 +553,7 @@ def ask_for_user_input(strMessage, type):
 def display_options():
     print("\n\n\n")
     # display the current user and account type
-    print(currentUser.get_user_name())
+    print(f"Welcome: {currentUser.get_user_name()}")
     #print("current acct type: " + currentUser.get_account_type())
     #store current user's account type
     currentAccountType = currentUser.get_account_type()

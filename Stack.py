@@ -28,3 +28,11 @@ class Stack:
     # Return the size of the stack
     def getSize(self):
         return len(self.__elements)
+
+    def __str__(self):
+        #create empty string
+        stackStr = ""
+        #loop through each element in the stack and append them to the string
+        for element in self.__elements:
+            stackStr += f"\n{str(element)}"
+        return stackStr

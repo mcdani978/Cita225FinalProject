@@ -48,5 +48,5 @@ class Product:
     def __str__(self):
         string = ("Product ID: " + str(self.__product_id) + "\nProduct Name: " + str(self.__product_name) +
                   "\nProduct Price: $" + str(self.__product_price) + "\nProduct Quantity: " + str(
-            self.__product_quantity) + "\n")
+            self.__product_quantity) + "\n\n")
         return string

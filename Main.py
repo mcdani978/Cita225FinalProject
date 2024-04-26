@@ -8,6 +8,8 @@ from savedData import *
 from UserAccount import UserAccount
 #get Functionalities class
 from Functionalities import Functionalities
+#get Colors class for color coding
+from Colors import Colors
 
 #create empty dictionary to store products with their ID as a key & the object as the value.
 #this INCLUDES the objects of the products
@@ -67,7 +69,8 @@ def add_product():
     #this method should create a new product object with ID, Price, Name, & Quantity
     #ask user to enter values for a new product
 
-    pID = ask_for_user_input("Please enter the product ID, or type -1 to exit: ", "int")
+    pID = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product ID, or type -1 to exit: "
+                             f"{Colors.RESET}", "int")
 
     #exit if input is negative
     if pID < 0:
@@ -75,13 +78,15 @@ def add_product():
 
     #if ID already exists, ask user to enter a different ID
     while pID in productDictionary:
-        print("ID already exists. Please enter a different ID")
-        pID = ask_for_user_input("Please enter the product ID, or type -1 to exit: ", "int")
+        print(f"{Colors.RED}{Colors.BOLD}ID already exists. Please enter a different ID{Colors.RESET}")
+        pID = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product ID, or type -1 to exit: "
+                                 f"{Colors.RESET}", "int")
         # exit if input is negative
         if pID < 0:
             return
 
-    pName = ask_for_user_input("Please enter the product Name,or type -1 to exit: ", "string")
+    pName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product Name,or type -1 to exit: "
+                               f"{Colors.RESET}", "string")
     pName = pName.lower()
 
     #exit if input is negative
@@ -91,21 +96,24 @@ def add_product():
 
     #if name already exists in productlist, ask user to enter a different name. this should igore case sensitivity
     while pName in productList:
-        print("name already exists. Please enter a different name")
-        pName = ask_for_user_input("Please enter the product Name, or type -1 to exit: ", "string")
+        print(f"{Colors.RED}{Colors.BOLD}name already exists. Please enter a different name{Colors.RESET}")
+        pName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product Name,or type -1 to exit: "
+                                   f"{Colors.RESET}", "string")
         pName = pName.lower()
 
         # exit if input is negative
         if pName == "-1":
             return
 
-    pPrice = ask_for_user_input("Please enter the product price, or type -1 to exit: ", "float")
+    pPrice = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product price, or type -1 to exit: "
+                                f"{Colors.RESET}", "float")
 
     # exit if input is negative
     if pPrice < 0:
         return
 
-    pQuantity = ask_for_user_input("Please enter the quantity of the product, or type -1 to exit: ", "int")
+    pQuantity = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the quantity of the product, or type -1 to exit: "
+                                   f"{Colors.RESET}", "int")
 
     # exit if input is negative
     if pQuantity < 0:
@@ -124,17 +132,17 @@ def add_product():
 def remove_product():
     display_inventory()
     #remove the product from the list & dictionary
-    userInput = ask_for_user_input("Please enter the product ID you want to remove, "
-                                "or type -1 to exit: ", "int")
+    userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product ID you want to remove, "
+                                f"or type -1 to exit: {Colors.RESET}", "int")
 
     if userInput < 0:
         return
 
     #check if item is in the dictionary. if not, ask user to enter a different value
     while userInput not in productDictionary:
-        print("Product ID not found. Please enter a different ID")
-        userInput = ask_for_user_input("Please enter the product ID you want to remove, "
-                                    "or type -1 to exit: ", "int")
+        print(f"{Colors.RED}{Colors.BOLD}Product ID not found. Please enter a different ID{Colors.RESET}")
+        userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the product ID you want to remove, "
+                                       f"or type -1 to exit: {Colors.RESET}", "int")
         if userInput < 0:
             return
 
@@ -151,30 +159,44 @@ def update_product_information():
     productKeys = productDictionary.keys()
 
     #display products and their ID to the user
-    for key in productDictionary:
-        print(f"{key}. {productDictionary[key]}")
+    display_inventory()
 
     #ask the user for a product ID.
-    userInput = ask_for_user_input("Please enter a product ID, or type -1 to exit: ", "int")
+    userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter a product ID, or type -1 to exit: "
+                                   f"{Colors.RESET}", "int")
     #check if ID exists. if not, ask for existing product ID
     while userInput not in productKeys:
         if userInput < 0:
             return
-        print("ID not found. Please enter an existing product ID")
-        userInput = ask_for_user_input("Please enter a product ID, or type -1 to exit: ", "int")
+        print(f"{Colors.RED}{Colors.BOLD}ID not found. Please enter an existing product ID{Colors.RESET}")
+        userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter a product ID, or type -1 to exit: "
+                                       f"{Colors.RESET}", "int")
 
     #display functionality options to the user
-    print("0. Update Product Name\n1. Update Product Price\n2. Update Product Quantity")
+    print(f"{Colors.BLUE}{Colors.BOLD}0. {Colors.RESET}"
+          f"{Colors.LIME}{Colors.BOLD}Update Product Name{Colors.RESET}"
+          f"{Colors.BLUE}{Colors.BOLD}\n1. "
+          f"{Colors.LIME}{Colors.BOLD}Update Product Price\n{Colors.RESET}"
+          f"{Colors.BLUE}{Colors.BOLD}2. {Colors.RESET}"
+          f"{Colors.LIME}{Colors.BOLD}Update Product Quantity{Colors.RESET}")
     #ask user to enter an option
-    userFunctionality = ask_for_user_input("What would you like to update for the product: ", "int")
+    userFunctionality = ask_for_user_input(f"{Colors.YELLOW}{Colors.BOLD}What would you like to update for the product: "
+                                           f"{Colors.RESET}", "int")
     #check for valid input
     while userFunctionality != 0 and userFunctionality != 1 and userFunctionality != 2:
         if userFunctionality < 0:
             return
         else:
-            print("Unsupported input. Please enter one of the following values")
-            print("0. Update Product Name\n1. Update Product Price\n2. Update Product Quantity")
-            userFunctionality = ask_for_user_input("What would you like to update for the product: ", "int")
+            print(f"{Colors.RED}{Colors.BOLD}Unsupported input. Please enter one of the following values{Colors.RESET}")
+            print(f"{Colors.BLUE}{Colors.BOLD}0. {Colors.RESET}"
+                  f"{Colors.LIME}{Colors.BOLD}Update Product Name{Colors.RESET}"
+                  f"{Colors.BLUE}{Colors.BOLD}\n1. "
+                  f"{Colors.LIME}{Colors.BOLD}Update Product Price\n{Colors.RESET}"
+                  f"{Colors.BLUE}{Colors.BOLD}2. {Colors.RESET}"
+                  f"{Colors.LIME}{Colors.BOLD}Update Product Quantity{Colors.RESET}")
+            userFunctionality = ask_for_user_input(
+                f"{Colors.YELLOW}{Colors.BOLD}What would you like to update for the product: "
+                f"{Colors.RESET}", "int")
 
     #match user input to the functionality
     match (userFunctionality):
@@ -195,21 +217,24 @@ def add_to_cart():
         #each node will be a Product added to the cart.
         #Display all products & let user choose product they want.
         for index in range(len(productList)):
-            print(f"{index}. " + productList[index])
+            print(f"{Colors.BLUE}{Colors.BOLD}{index}. {Colors.RESET}"
+                  f"{Colors.LIME}{productList[index]}{Colors.RESET}")
 
 
         #ask the user what product to add to cart
-        userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                    "or type -1 to exit: ", "int")
+        userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}please choose an item you want to add to cart, "
+                                    f"or type -1 to exit: {Colors.RESET}", "int")
         if userInput < 0:
             return
         #check for valid input
         while userInput >= len(productList):
-            print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
+            print(f"{Colors.RED}{Colors.BOLD}Invalid input. Please choose one of the diplayed products, or type -1 to exit"
+                  f"{Colors.RESET}")
             for index in range(len(productList)):
-                print(f"{index}. " + productList[index])
-            userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                        "or type -1 to exit: ", "int")
+                print(f"{Colors.BLUE}{Colors.BOLD}{index}. {Colors.RESET}"
+                      f"{Colors.LIME}{productList[index]}{Colors.RESET}")
+            userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}please choose an item you want to add to cart, "
+                                           f"or type -1 to exit: {Colors.RESET}", "int")
             if userInput < 0:
                 return
 
@@ -223,7 +248,7 @@ def add_to_cart():
             if tempObj.get_name() == productList[userInput]:
                 #check if the store has ran out of the product
                 if tempObj.get_quantity() == 0:
-                    print("Sorry, we are out of that product")
+                    print(f"{Colors.RED}{Colors.BOLD}Sorry, we are out of that product{Colors.RESET}")
                     break; #no need to continue looping
                 else:
                     #store current user's shopping cart in temporary cart
@@ -232,7 +257,7 @@ def add_to_cart():
                     index = 0
                     #check if cart is empty. if it is, simply add new item to cart
                     if tempCart.isEmpty():
-                        print("adding to empty cart...")
+                        print(f"{Colors.YELLOW}{Colors.BOLD}adding to empty cart...{Colors.RESET}")
                         # create new product & append to the temporary cart.
                         newProduct = Product(tempObj.get_id(), tempObj.get_name(), tempObj.get_price(), 1)
                         # append object to cart
@@ -243,7 +268,7 @@ def add_to_cart():
                     while index < tempCart.getSize():
                         #compare the ID of the tempObj to the ID of the object in cart
                         if tempObj.get_id() == tempCart.get(index).get_id():
-                            print("adding to existing item...")
+                            print(f"{Colors.YELLOW}{Colors.BOLD}adding to existing item...{Colors.RESET}")
                             #add 1 to quantity of the object in cart & remove 1 from the product in the dictionary
                             tempCart.get(index).add_quantity(1)
                             tempObj.remove_quantity(1)
@@ -251,7 +276,7 @@ def add_to_cart():
                         else:
                             #check if the object is last in cart. If so, we need to add a new product to the cart
                             if index == tempCart.getSize()-1:
-                                print("adding new item to cart...")
+                                print(f"{Colors.YELLOW}{Colors.BOLD}adding new item to cart...{Colors.RESET}")
                                 #create new product & append to the temporary cart.
                                 newProduct = Product(tempObj.get_id(), tempObj.get_name(), tempObj.get_price(), 1)
                                 #append object to cart
@@ -271,30 +296,31 @@ def remove_from_cart():
 
         index = 0
         while index < currentUser.get_shopping_cart().getSize():
-            print(f"{index}. {currentUser.get_shopping_cart().get(index).get_name()}")
+            print(f"{Colors.BLUE}{Colors.BOLD}{index}. {Colors.RESET}"
+                  f"{Colors.LIME}{currentUser.get_shopping_cart().get(index).get_name()}{Colors.RESET}")
             index += 1
 
-#        for index in range(len(productList)):
- #           print(f"{index}. " + productList[index])
-
         #ask user what they want to remove
-        userInput = ask_for_user_input("What product from cart do you want to remove?, "
-                                    "or type -1 to exit: ", "int")
+        userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}What product from cart do you want to remove?, "
+                                    f"or type -1 to exit: {Colors.RESET}", "int")
         if userInput < 0:
             return
         while userInput >= currentUser.get_shopping_cart().getSize():
-            print("Invalid input. Please choose one of the diplayed products, or type -1 to exit")
+            print(f"{Colors.RED}{Colors.BOLD}Invalid input. Please choose one of the diplayed products, or type -1 to exit"
+                  f"{Colors.RESET}")
+
             index = 0
             while index < currentUser.get_shopping_cart().getSize():
-                print(f"{index}. {currentUser.get_shopping_cart().get(index).get_name()}")
+                print(f"{Colors.BLUE}{Colors.BOLD}{index}. {Colors.RESET}"
+                      f"{Colors.LIME}{currentUser.get_shopping_cart().get(index).get_name()}{Colors.RESET}")
                 index += 1
-            userInput = ask_for_user_input("please choose an item you want to add to cart, "
-                                        "or type -1 to exit: ", "int")
+            userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}What product from cart do you want to remove?, "
+                                           f"or type -1 to exit: {Colors.RESET}", "int")
             if userInput < 0:
                 return
 
         #remove 1 quantity of product from cart & add action to history
-        print("removing...")
+        print(f"{Colors.YELLOW}{Colors.BOLD}removing...{Colors.RESET}")
         #add action to cart history
         currentUser.add_to_cart_history(currentUser.get_shopping_cart().get(userInput))
         #add respective quantity back to the inventory
@@ -315,15 +341,20 @@ def undo_remove_from_cart():
     if addBackToCart != None:
         #check if the inventory is empty
         if productDictionary[addBackToCart.get_id()].get_quantity() == 0:
-            print("Sorry, we are out of that product")
+            print(f"{Colors.YELLOW}{Colors.BOLD}Sorry, we are out of that product{Colors.RESET}")
             return
         else:
             #remove respective quantity from product dictionary
             productDictionary[addBackToCart.get_id()].remove_quantity(1)
 
-            print("Adding back to cart")
+            print(f"{Colors.YELLOW}{Colors.BOLD}Adding back to cart{Colors.RESET}")
             #find product in current user's shopping cart and add the respective quantity back to the cart
             index = 0
+            if currentUser.get_shopping_cart().getSize() == 0:
+                #add item to empty cart
+                newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name(), addBackToCart.get_price(), 1)
+                currentUser.get_shopping_cart().addLast(newProduct)
+                return
             while index <= currentUser.get_shopping_cart().getSize():
                 #check if the ID of the product to add match the index of the product
                 if addBackToCart.get_id() == currentUser.get_shopping_cart().get(index).get_id():
@@ -333,23 +364,24 @@ def undo_remove_from_cart():
                 else:
                     if index == currentUser.get_shopping_cart().getSize():
                         #create new object qith respective quantity and append to the the user's shopping cart
-                        newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name, addBackToCart.get_price, 1)
+                        newProduct = Product(addBackToCart.get_id(), addBackToCart.get_name(), addBackToCart.get_price(),
+                                             1)
                         currentUser.get_shopping_cart().addLast(newProduct)
                         break; #no need to continue looping
                 index += 1
     else:
-        print("No action in history")
+        print(f"{Colors.YELLOW}{Colors.BOLD}No action in history{Colors.RESET}")
 
 #permissions: guest, user, admin
 def display_inventory():
     for key in productDictionary:
-        print(productDictionary[key])
+        print(f"{Colors.BLUE}{Colors.BOLD}{productDictionary[key]}{Colors.RESET}")
         print()
 
 #permissions: guest, user
 def display_cart():
     #print the shopping cart
-    print(currentUser.get_shopping_cart())
+    print(f"{Colors.BLUE}{Colors.BOLD}{currentUser.get_shopping_cart()}{Colors.RESET}")
 
 #permissions: guest
 def login():
@@ -357,18 +389,18 @@ def login():
     userAccountKeys = userAccounts.keys()
 
     #ask user for username and password.
-    userName = ask_for_user_input("Username: ", "string")
-    password = ask_for_user_input("Password: ", "string")
+    userName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Username: {Colors.RESET}", "string")
+    password = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Password: {Colors.RESET}", "string")
     #search for the username in the dictionary
     while userName not in userAccountKeys or password != userAccounts[userName].get_password():
         #tell user the username or password is wrong and ask for new username and password
-        print("Incorrect username or password")
-        tryAgain = ask_for_user_input("Try Again (enter positive number for yes, negative number for no)? ",
-                                   "float")
+        print(f"{Colors.RED}{Colors.BOLD}Incorrect username or password{Colors.RESET}")
+        tryAgain = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Try Again (enter positive number for yes, "
+                                      f"negative number for no)? {Colors.RESET}","float")
         if tryAgain < 0:
             return
-        userName = ask_for_user_input("Username: ", "string")
-        password = ask_for_user_input("Password: ", "string")
+        userName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Username: {Colors.RESET}", "string")
+        password = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Password: {Colors.RESET}", "string")
 
     #declare currentUser variable global before using to bypass making it a local variable
     global currentUser
@@ -386,19 +418,19 @@ def sign_up():
     userAccountNames = userAccounts.keys()
 
     #ask the user for a username and password
-    userName = ask_for_user_input("Username: ", "string")
+    userName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Username: {Colors.RESET}", "string")
     while userName in userAccountNames:
-        print("Username already taken. Please enter a different username")
-        userName = ask_for_user_input("Username: ", "string")
+        print(f"{Colors.RED}{Colors.BOLD}Username already taken. Please enter a different username{Colors.RESET}")
+        userName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Username: {Colors.RESET}", "string")
 
-    password = ask_for_user_input("Password: ", "string")
-    checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+    password = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Password: {Colors.RESET}", "string")
+    checkPassword = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Re-enter Password: {Colors.RESET}", "string")
 
     #ask the user to enter a new password if the two passwords do not match
     while password != checkPassword:
-        print("Passwords do not match. Please re-enter your password")
-        password = ask_for_user_input("Password: ", "string")
-        checkPassword = ask_for_user_input("Re-enter Password: ", "string")
+        print(f"{Colors.RED}{Colors.BOLD}Passwords do not match. Please re-enter your password{Colors.RESET}")
+        password = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Password: {Colors.RESET}", "string")
+        checkPassword = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Re-enter Password: {Colors.RESET}", "string")
 
     #create user account
     newAccount = UserAccount(userName, password, 0, "user",
@@ -413,10 +445,8 @@ def sign_up():
 
     #declare currentUser variable global before using to bypass making it a local variable
     global currentUser
-    print("previours current user: " + currentUser.get_user_name())
     #set current user to new user
     currentUser = newAccount
-    print("new current user: " + currentUser.get_user_name())
 
 #permissions: user, admin
 def sign_out():
@@ -427,13 +457,23 @@ def sign_out():
 #permissions: user
 def delete_account():
     deleteString = "DELETE"
-    print("Are you sure you want to delete your account?\nTpye '" + deleteString + "' to delete your account, or type 'no' to exit")
+    print(f"{Colors.YELLOW}{Colors.BOLD}Are you sure you want to delete your account?{Colors.RESET}"
+          f"{Colors.YELLOW}{Colors.BOLD}\nType '{Colors.RESET}"
+          f"{Colors.RED}{Colors.BOLD}{deleteString}{Colors.RESET}"
+          f"{Colors.YELLOW}{Colors.BOLD}' to delete your account, or type '{Colors.RESET}"
+          f"{Colors.RED}{Colors.BOLD}no{Colors.RESET}"
+          f"{Colors.YELLOW}{Colors.BOLD}' to exit{Colors.RESET}")
     userInput = ask_for_user_input("", "string")
 
     while userInput != deleteString:
         if userInput == "no":
             return
-        print("invalid input. Please enter '" + deleteString + "' to delete your account, or type 'no' to exit")
+        print(f"{Colors.RED}{Colors.BOLD}invalid input. \n{Colors.RESET}"
+              f"{Colors.YELLOW}{Colors.BOLD}Please enter '{Colors.RESET}"
+              f"{Colors.RED}{Colors.BOLD}{deleteString}' {Colors.RESET}"
+              f"{Colors.YELLOW}{Colors.BOLD}to delete your account, or type '{Colors.RESET}"
+              f"{Colors.RED}{Colors.BOLD}no{Colors.RESET}"
+              f"{Colors.YELLOW}{Colors.BOLD}' to exit{Colors.RESET}")
         userInput = ask_for_user_input("", "string")
 
     global currentUser
@@ -444,24 +484,29 @@ def delete_account():
 def get_user_names():
     #print the usernames, separated by lines
     for key in userAccounts:
-        print(key)
+        print(f"{Colors.BLUE}{Colors.BOLD}{key}{Colors.RESET}")
 
 #permissions: user
 def set_admin_permission():
     #if the account enters the correct admin password, set account type to admin
-    userInput = ask_for_user_input("Please enter the password, or type 'no' to exit: ", "string")
+    userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the password, or type 'no' to exit: "
+                                   f"{Colors.RESET}", "string")
     while userInput != STR_ADMIN_PASSWORD:
         if userInput == "no":
             return
         else:
-            print("Incorrect password.")
-            userInput = ask_for_user_input("Please enter the password, or type 'no' to exit: ", "string")
+            print(f"{Colors.RED}{Colors.BOLD}Incorrect password.{Colors.RESET}")
+            userInput = ask_for_user_input(
+                f"{Colors.BLUE}{Colors.BOLD}Please enter the password, or type '{Colors.RESET}"
+                f"{Colors.CYAN}{Colors.BOLD}no{Colors.RESET}"
+                f"{Colors.BLUE}{Colors.BOLD}' to exit: {Colors.RESET}"
+                f"{Colors.RESET}", "string")
     #if you got this far, you get to be an admin!
     currentUser.set_account_type("admin")
 
 #permissions: user, admin
 def change_user_name():
-    userInput = ask_for_user_input("New Username: ", "string")
+    userInput = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}New Username: {Colors.RESET}", "string")
     currentUser.set_user_name(userInput)
 
 #permissions: user
@@ -499,7 +544,7 @@ def change_password():
 
 #permissions: guest, user
 def check_account_information():
-    print(currentUser)
+    print(f"{Colors.BLUE}{Colors.BOLD}{currentUser}{Colors.RESET}")
 
 #permissions: user
 def proceed_to_checkout():
@@ -532,7 +577,7 @@ def ask_for_user_input(strMessage, type):
             testInput = userInput.replace("-", "")
             #Check if user input is a number. if not, make them enter a valid number
             while not testInput.isdigit():
-                print("Please enter a valid number")
+                print(f"{Colors.RED}{Colors.BOLD}Please enter a valid number{Colors.RESET}")
                 userInput = input(strMessage)
                 testInput = userInput.replace(".", "")
                 testInput = userInput.replace("-", "")
@@ -540,7 +585,7 @@ def ask_for_user_input(strMessage, type):
                 # check if user input is an integer. if not, that is it contains a "." in the number, repeat the function
                 # for the user to enter an integer.
             if "." in userInput:
-                print("Please enter an integer")
+                print(f"{Colors.RED}{Colors.BOLD}Please enter an integer{Colors.RESET}")
                 userInput = ask_for_user_input(strMessage, type)
             return int(userInput)
         case "float":
@@ -555,7 +600,7 @@ def ask_for_user_input(strMessage, type):
 
             # Check if user input is a number. if not, make them enter a valid number
             while not testInput.isdigit():
-                print("Please enter a valid number")
+                print(f"{Colors.RED}{Colors.BOLD}Please enter a valid number{Colors.RESET}")
                 userInput = input(strMessage)
                 testInput = userInput.replace(".", "")
             return float(userInput)
@@ -566,7 +611,9 @@ def ask_for_user_input(strMessage, type):
 def display_options():
     print("\n\n\n")
     # display the current user and account type
-    print(f"Welcome: {currentUser.get_user_name()}")
+    print(f"{Colors.CYAN}Welcome: {Colors.RESET}"
+          f"{Colors.BOLD}{Colors.GREEN}{currentUser.get_user_name()}{Colors.RESET}")
+
     #print("current acct type: " + currentUser.get_account_type())
     #store current user's account type
     currentAccountType = currentUser.get_account_type()
@@ -581,15 +628,13 @@ def display_options():
 
 
     #loop through functionalities and display options to the user
-
-#    for index in range(len(supportedFunctionalities)):
- #       print(str(index + 1) + ". " + supportedFunctionalities[index][0])
     for index in range(len(supportedFunctionalities)):
-        print(str(index + 1) + ". " + supportedFunctionalities[index].get_functionality_text())
+        print(f"{Colors.BLUE}{Colors.BOLD}{str(index + 1)}. {Colors.RESET}"
+              f"{Colors.LIME}{supportedFunctionalities[index].get_functionality_text()}{Colors.RESET}")
 
-    print("Default: Exit Program")
+    print(f"{Colors.RED}{Colors.BOLD}Default: Exit Program{Colors.RESET}")
 
-    userInput = ask_for_user_input("Please enter your Option: ", "int")
+    userInput = ask_for_user_input(f"{Colors.BLUE}Please enter your Option: {Colors.RESET}", "int")
 
     if userInput-1 not in range(len(supportedFunctionalities)):
         return False
@@ -605,14 +650,17 @@ def display_options():
 
 def update_product_quantity(pID):
     #ask user for new quantity for the product
-    newQuantity = ask_for_user_input("please enter the new quantity of the product, or type -1 to exit: ", "int")
+    newQuantity = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}please enter the new quantity of the product, "
+                                     f"or type -1 to exit: {Colors.RESET}", "int")
     #return if value is negative
     if newQuantity < 0:
         return
     #update quantity of the product
     productDictionary[pID].set_quantity(newQuantity)
+
 def update_product_name(pID):
-    pName = ask_for_user_input("Please enter the new product Name,or type -1 to exit: ", "string")
+    pName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the new product Name,or type -1 to exit: "
+                               f"{Colors.RESET}", "string")
     pName = pName.lower()
 
     # exit if input is negative
@@ -620,8 +668,9 @@ def update_product_name(pID):
         return
     # if name already exists in productlist, ask user to enter a different name. this should igore case sensitivity
     while pName in productList:
-        print("name already exists. Please enter a different name")
-        pName = ask_for_user_input("Please enter the new product Name, or type -1 to exit: ", "string")
+        print(f"{Colors.RED}{Colors.BOLD}name already exists. Please enter a different name{Colors.RESET}")
+        pName = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the new product Name,or type -1 to exit: "
+                                   f"{Colors.RESET}", "string")
         pName = pName.lower()
         # exit if input is negative
         if pName == "-1":
@@ -631,13 +680,13 @@ def update_product_name(pID):
     productDictionary[pID].set_name(pName)
 
 def update_product_price(pID):
-    pPrice = ask_for_user_input("Please enter the new product price, or type -1 to exit: ", "float")
+    pPrice = ask_for_user_input(f"{Colors.BLUE}{Colors.BOLD}Please enter the new product price, or type -1 to exit: "
+                                f"{Colors.RESET}", "float")
     # exit if input is negative
     if pPrice < 0:
         return
     #update product price
     productDictionary[pID].set_price(pPrice)
-
 
 def initialize_program():
     #set the productDictionary from dictionary information given by savedData.py

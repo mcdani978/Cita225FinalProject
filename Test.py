@@ -1,13 +1,20 @@
-def my_function():
-    print("Hello, I'm a function!")
+# ANSI color codes
+class colors:
+    RESET = '\033[0m'
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-# Function name as a string
-function_name = "my_function"
+# Print colored text
+print(colors.RED + "This text is red." + colors.RESET)
+print(colors.GREEN + "This text is green." + colors.RESET)
+print(colors.BLUE + "This text is blue." + colors.RESET)
 
-# Call the function using globals()
-if function_name in globals() and callable(globals()[function_name]):
-    globals()[function_name]()
-
-# Or using locals() if the function is in the current scope
-if function_name in locals() and callable(locals()[function_name]):
-    locals()[function_name]()
+print(f"{colors.BOLD}BOLD TEXT{colors.RESET}\n{colors.BLUE}BLUE TEXT{colors.RESET}")

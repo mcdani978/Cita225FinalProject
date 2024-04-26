@@ -44,6 +44,15 @@ class Product:
         else:
             self.__product_quantity = amount
 
+    def set_name(self, newName):
+        self.__product_name = newName
+
+    def set_price(self, newPrice):
+        if newPrice < 0:
+            raise Exception("Error: Price cannot be negative")
+        else:
+            self.__product_price = newPrice
+
     # Update the toString method to display all attributes & their values
     def __str__(self):
         string = ("Product ID: " + str(self.__product_id) + "\nProduct Name: " + str(self.__product_name) +

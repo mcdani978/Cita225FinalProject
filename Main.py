@@ -32,7 +32,7 @@ STR_ADMIN_PASSWORD = "CITA225"
 functionalities = [
     Functionalities("add_product","Add Product",[STR_ADMIN]),
     Functionalities("remove_product","Remove Product",[STR_ADMIN]),
-    Functionalities("update_product_quantity","Update Product Quantity",[STR_ADMIN]),
+    Functionalities("update_product_information","Update Product Information",[STR_ADMIN]),
     Functionalities("add_to_cart","Add To Cart",[STR_GUEST, STR_USER]),
     Functionalities("remove_from_cart","Remove From Cart",[STR_GUEST, STR_USER]),
     Functionalities("undo_remove_from_cart","Undo Remove From Cart",[STR_GUEST, STR_USER]),
@@ -146,37 +146,47 @@ def remove_product():
     productList.remove(pName)
 
 #permissions: admin
-def update_product_quantity():
-    #remove the product from the list & dictionary
-    userInput = ask_for_user_input("Please enter the product ID for the product you wish to update, "
-                                "or type -1 to exit: ", "int")
+def update_product_information():
+    #store keys of dictionary in variable
+    productKeys = productDictionary.keys()
 
-    if userInput < 0:
-        return
+    #display products and their ID to the user
+    for key in productDictionary:
+        print(f"{key}. {productDictionary[key]}")
 
-    #check if item is in the dictionary. if not, ask user to enter a different value
-    while userInput not in productDictionary:
-        print("Product ID not found. Please enter a different ID")
-        userInput = ask_for_user_input("Please enter the product ID you want to remove, "
-                                    "or type -1 to exit: ", "int")
+    #ask the user for a product ID.
+    userInput = ask_for_user_input("Please enter a product ID, or type -1 to exit: ", "int")
+    #check if ID exists. if not, ask for existing product ID
+    while userInput not in productKeys:
         if userInput < 0:
             return
+        print("ID not found. Please enter an existing product ID")
+        userInput = ask_for_user_input("Please enter a product ID, or type -1 to exit: ", "int")
 
-    #ask user for new quantity for the product
-    newQuantity = ask_for_user_input("please enter the new quantity of the product: ", "int")
-
-    if newQuantity < 0:
-        return
-
-    while newQuantity < 0:
-        print("Invalid quantity. Please enter a positive integer")
-        newQuantity = ask_for_user_input("please enter the new quantity of the product, "
-                                      "or type -1 to exit", "int")
-        if newQuantity < 0:
+    #display functionality options to the user
+    print("0. Update Product Name\n1. Update Product Price\n2. Update Product Quantity")
+    #ask user to enter an option
+    userFunctionality = ask_for_user_input("What would you like to update for the product: ", "int")
+    #check for valid input
+    while userFunctionality != 0 and userFunctionality != 1 and userFunctionality != 2:
+        if userFunctionality < 0:
             return
+        else:
+            print("Unsupported input. Please enter one of the following values")
+            print("0. Update Product Name\n1. Update Product Price\n2. Update Product Quantity")
+            userFunctionality = ask_for_user_input("What would you like to update for the product: ", "int")
 
-    #update quantity of the product
-    productDictionary[userInput].set_quantity(newQuantity)
+    #match user input to the functionality
+    match (userFunctionality):
+        case 0:
+            #run update product name functionality
+            update_product_name(userInput)
+        case 1:
+            #run update product price functionality
+            update_product_price(userInput)
+        case 2:
+            #run update product quantity functionality
+            update_product_quantity(userInput)
 
 #permissions: guest, user
 def add_to_cart():
@@ -592,6 +602,42 @@ def display_options():
 
              globals()[supportedFunctionalities[userInput-1].get_functionality_name()]()
     return True
+
+def update_product_quantity(pID):
+    #ask user for new quantity for the product
+    newQuantity = ask_for_user_input("please enter the new quantity of the product, or type -1 to exit: ", "int")
+    #return if value is negative
+    if newQuantity < 0:
+        return
+    #update quantity of the product
+    productDictionary[pID].set_quantity(newQuantity)
+def update_product_name(pID):
+    pName = ask_for_user_input("Please enter the new product Name,or type -1 to exit: ", "string")
+    pName = pName.lower()
+
+    # exit if input is negative
+    if pName == "-1":
+        return
+    # if name already exists in productlist, ask user to enter a different name. this should igore case sensitivity
+    while pName in productList:
+        print("name already exists. Please enter a different name")
+        pName = ask_for_user_input("Please enter the new product Name, or type -1 to exit: ", "string")
+        pName = pName.lower()
+        # exit if input is negative
+        if pName == "-1":
+            return
+
+    #update product name
+    productDictionary[pID].set_name(pName)
+
+def update_product_price(pID):
+    pPrice = ask_for_user_input("Please enter the new product price, or type -1 to exit: ", "float")
+    # exit if input is negative
+    if pPrice < 0:
+        return
+    #update product price
+    productDictionary[pID].set_price(pPrice)
+
 
 def initialize_program():
     #set the productDictionary from dictionary information given by savedData.py
